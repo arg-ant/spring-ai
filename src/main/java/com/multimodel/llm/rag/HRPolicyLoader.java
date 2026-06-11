@@ -22,15 +22,6 @@ public class HRPolicyLoader {
     @Value("classpath:Eazybytes_HR_Policies.pdf")
     Resource policyFile;
 
-//    @PostConstruct
-//    public void loadPDF() {
-//        TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(policyFile);
-//        List<Document> documents = tikaDocumentReader.read();
-//        TextSplitter textSplitter =
-//                TokenTextSplitter.builder().withChunkSize(200).withMaxNumChunks(400).build();
-//        vectorStore.add(textSplitter.split(documents));
-//    }
-
     // Execute this method automatically once after Spring creates the bean
 // Commonly used for initialization logic such as loading data into a vector store
     @PostConstruct

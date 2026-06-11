@@ -13,11 +13,13 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class ChatClientConfig {
 
-    @Bean
+    @Bean("defaultChatClient")
+    @Scope("prototype")
     public ChatClient.Builder chatClientBuilder(
             OllamaChatModel ollamaChatModel) {
         return ChatClient.builder(ollamaChatModel);
@@ -33,7 +35,9 @@ public class ChatClientConfig {
     public ChatClient ollamaChatClient(OllamaChatModel ollamaChatModel) {
 //        var options = OllamaChatOptions.builder().temperature(0.7).maxTokens(250);
 
-        ChatClient.Builder builder = ChatClient.builder(ollamaChatModel);
+//        ChatClient.Builder builder = ChatClient.builder(ollamaChatModel);
+        ChatClient.Builder builder = chatClientBuilder(ollamaChatModel);
+
         return builder
 //                .defaultSystem("You are an internal IT helpdesk assistant.")
 //                .defaultUser("What can I help you with?")
@@ -60,10 +64,9 @@ public class ChatClientConfig {
         Advisor memoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
         return chatClientBuilder
                 .defaultAdvisors(
-                        loggerAdvisor,
                         memoryAdvisor,
-                        new TokenUsageLoggerAdvisor(),
-                        ragAdvisor)
+                        ragAdvisor,
+                        loggerAdvisor)
                 .build();
     }
 }

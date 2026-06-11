@@ -1,7 +1,25 @@
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_llm
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
   qdrant:
     image: qdrant/qdrant:latest
     container_name: qdrant
     ports:
-      - 6333:6333   # REST API
-      - 6334:6334   # gRPC
+      - "6333:6333"   # REST API
+      - "6334:6334"   # gRPC
+    depends_on:
+      - ollama
+
+volumes:
+  ollama:
+    external: true # use existing volume
+
+networks:
+  spring_ai:
+    driver: bridge

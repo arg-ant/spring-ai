@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component //commented out to avoid loading data into vector store
+//@Component //commented out to avoid loading data into vector store
 public class RandomDataLoader {
 
     @Autowired

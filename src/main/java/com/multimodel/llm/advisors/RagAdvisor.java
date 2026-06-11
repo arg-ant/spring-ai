@@ -1,5 +1,6 @@
 package com.multimodel.llm.advisors;
 
+import com.multimodel.llm.rag.PIIMaskingDocumentPostProcessor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
@@ -21,6 +22,7 @@ public class RagAdvisor {
                         .builder()
                         .chatClientBuilder(chatClientBuilder.clone())
                         .targetLanguage("english").build())
+                .documentPostProcessors(PIIMaskingDocumentPostProcessor.builder())
                 .documentRetriever(VectorStoreDocumentRetriever
                         .builder()
                         .similarityThreshold(0.5)

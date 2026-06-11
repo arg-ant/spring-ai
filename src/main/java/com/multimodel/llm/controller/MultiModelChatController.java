@@ -1,11 +1,9 @@
 package com.multimodel.llm.controller;
 
 import com.multimodel.llm.model.CountryCities;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,13 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +42,7 @@ public class MultiModelChatController {
     }
 
     @RequestMapping("/ollama/chat")
-    public String ollamaChat(@RequestParam("message") String message) {
+    public String chat(@RequestParam("message") String message) {
         logMessage(message);
         return ollamaChatClient.prompt(message).call().content();
     }
@@ -75,12 +71,17 @@ public class MultiModelChatController {
     @Value("classpath:/promptTemplates/systemPromptTemplate.st")
     Resource systemPromptTemplate;
 
+//    hrPolicy used only in tests
+    @Value("classpath:/promptTemplates/hrPolicy.st")
+    Resource hrPolicyTemplate;
+
     @RequestMapping("/prompt-stuffing")
-    public String ollamaPromptStuff(@RequestParam("message") String message) {
+    public String promptStuff(@RequestParam("message") String message) {
         logMessage(message);
         return ollamaChatClient
                 .prompt(message)
-                .system(systemPromptTemplate)
+                .system(hrPolicyTemplate) // hrPolicy used only in tests
+//                .system(systemPromptTemplate) //system prompt used in development
                 .user(message)
                 .call()
                 .content();
