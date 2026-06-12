@@ -2,7 +2,6 @@ package com.multimodel.llm.config;
 
 import com.multimodel.llm.advisors.TokenUsageLoggerAdvisor;
 import com.multimodel.llm.rag.FirecrawlWebSearchDocumentRetriever;
-import com.multimodel.llm.rag.TavilyWebSearchDocumentRetriever;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -17,9 +16,9 @@ import org.springframework.web.client.RestClient;
 public class WebSearchRagChatClientConfig {
 
     @Bean("webSearchRagChatClient")
-    public ChatClient chatClient(ChatClient.Builder chatClientBuilder,
-                                 ChatMemory chatMemory,
-                                 RestClient.Builder restClientBuilder) {
+    public ChatClient webChatClient(ChatClient.Builder chatClientBuilder,
+                                    ChatMemory chatMemory,
+                                    RestClient.Builder restClientBuilder) {
         Advisor loggerAdvisor = new SimpleLoggerAdvisor();
         Advisor memoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
         var webSearchRAGAdvisor = RetrievalAugmentationAdvisor.builder()

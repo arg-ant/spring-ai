@@ -1,8 +1,7 @@
 package com.multimodel.llm.controller;
 
 import com.multimodel.llm.model.CountryCities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
@@ -23,8 +22,6 @@ import java.util.Map;
 @RequestMapping("/api")
 public class MultiModelChatController {
 
-    private static final Logger log = LoggerFactory.getLogger(MultiModelChatController.class);
-
     private final ChatClient openAiChatClient;
     private final ChatClient ollamaChatClient;
 
@@ -37,13 +34,11 @@ public class MultiModelChatController {
 
     @RequestMapping("/openai/chat")
     public String openAiChat(@RequestParam("message") String message) {
-        logMessage(message);
         return openAiChatClient.prompt(message).call().content();
     }
 
     @RequestMapping("/ollama/chat")
     public String chat(@RequestParam("message") String message) {
-        logMessage(message);
         return ollamaChatClient.prompt(message).call().content();
     }
 
@@ -56,7 +51,6 @@ public class MultiModelChatController {
             @RequestParam("customerName") String customerName,
             @RequestParam("customerMessage") String customerMessage) {
 
-        logMessage(customerName, customerMessage);
         return ollamaChatClient
                 .prompt(customerName)
                 .system(promptTemplate)
@@ -77,7 +71,6 @@ public class MultiModelChatController {
 
     @RequestMapping("/prompt-stuffing")
     public String promptStuff(@RequestParam("message") String message) {
-        logMessage(message);
         return ollamaChatClient
                 .prompt(message)
                 .system(hrPolicyTemplate) // hrPolicy used only in tests
@@ -89,7 +82,6 @@ public class MultiModelChatController {
 
     @RequestMapping("/stream")
     public Flux<String> ollamaStream(@RequestParam("message") String message) {
-        logMessage(message);
         return ollamaChatClient
                 .prompt()
                 .user(message)
@@ -144,10 +136,5 @@ public class MultiModelChatController {
                         });
 
         return ResponseEntity.ok(countryCities);
-    }
-
-    private void logMessage(String... messages) {
-        String joinedMessage = String.join(" | ", messages);
-        log.info("Received message(s): {}", joinedMessage);
     }
 }

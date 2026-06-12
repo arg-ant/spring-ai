@@ -1,17 +1,20 @@
 package com.multimodel.llm;
 
+import com.multimodel.llm.config.ChatClientFactory;
 import com.multimodel.llm.config.WebSearchRagChatClientConfig;
 import com.multimodel.llm.controller.MultiModelChatController;
 import com.multimodel.llm.controller.RagController;
+
+import com.multimodel.llm.controller.SelfEvaluatingChatController;
 import org.junit.jupiter.api.*;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+
 import org.springframework.ai.chat.evaluation.FactCheckingEvaluator;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
-import org.springframework.ai.ollama.OllamaChatModel;
+
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(properties = {
-//        "spring.ai.openai.api-key=dummy",
         "logging.level.org.springframework.ai=DEBUG"})
 class MultiModelApplicationTests {
 
@@ -43,12 +45,11 @@ class MultiModelApplicationTests {
     private RagController ragController;
 
     @Autowired
-    private MultiModelChatController multiModelChatController;
+    private ChatClientFactory chatClientFactory;
 
     @Autowired
-    private OllamaChatModel ollamaChatModel;
+    private MultiModelChatController multiModelChatController;
 
-    private ChatClient chatClient;
     private RelevancyEvaluator relevancyEvaluator;
     private FactCheckingEvaluator factCheckingEvaluator;
 
@@ -61,11 +62,12 @@ class MultiModelApplicationTests {
 
     @BeforeEach
     void setup() {
-        ChatClient.Builder chatClientBuilder =
-                ChatClient.builder(ollamaChatModel).defaultAdvisors(new SimpleLoggerAdvisor());
-        this.chatClient = chatClientBuilder.build();
-        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder.defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation."));
+        ChatClient.Builder chatClientBuilder = chatClientFactory.createOllama();
+        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder
+                .defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation."));
         this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
+//        #TODO check BESPOKE_MINICHECK implementation
+//        this.factCheckingEvaluator = FactCheckingEvaluator.forBespokeMinicheck(chatClientBuilder);
     }
 
     @Test
@@ -100,7 +102,6 @@ class MultiModelApplicationTests {
                                 ========================================
                                 """, response.getScore(), minRelevancyScore, question, aiResponse)
                         .isGreaterThan(minRelevancyScore));
-
     }
 
     @Test
@@ -126,7 +127,6 @@ class MultiModelApplicationTests {
                                 ========================================
                                 """, question, aiResponse)
                         .isTrue());
-
     }
 
     @Test
@@ -138,17 +138,13 @@ class MultiModelApplicationTests {
 
         // When
         String aiResponse = multiModelChatController.promptStuff(question);
-
         String retrievedContext = hrPolicyTemplate.getContentAsString(StandardCharsets.UTF_8);
-
         EvaluationRequest evaluationRequest = new EvaluationRequest(
                 question,
                 List.of(new Document(retrievedContext)),
-                aiResponse
-        );
+                aiResponse);
 
         EvaluationResponse evaluationResponse = factCheckingEvaluator.evaluate(evaluationRequest);
-
 
         // Then
         Assertions.assertAll(
