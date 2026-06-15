@@ -5,7 +5,6 @@ import com.multimodel.llm.config.WebSearchRagChatClientConfig;
 import com.multimodel.llm.controller.MultiModelChatController;
 import com.multimodel.llm.controller.RagController;
 
-import com.multimodel.llm.controller.SelfEvaluatingChatController;
 import org.junit.jupiter.api.*;
 import org.springframework.ai.chat.client.ChatClient;
 

@@ -3,23 +3,19 @@ package com.multimodel.llm.rag;
 import jakarta.annotation.PostConstruct;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Component //commented out to avoid loading data into vector store
+@Component //commented out to avoid loading data into vector store
 public class RandomDataLoader {
 
-    @Autowired
-    VectorStore vectorStore;
+    private final VectorStore vectorStore;
 
-//    private final VectorStore vectorStore;
-
-//    public RandomDataLoader(VectorStore vectorStore) {
-//        this.vectorStore = vectorStore;
-//    }
+    public RandomDataLoader(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
 
     @PostConstruct
     public void loadSentencesIntoVectorStore() {

@@ -16,10 +16,45 @@ services:
     depends_on:
       - ollama
 
-volumes:
-  ollama:
-    external: true # use existing volume
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - "./prometheus-config.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - spring_ai
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana # Persist Grafana data (dashboard)
+    networks:
+        - spring_ai
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686" # web ui
+      - "4317:4317" #grpc
+      - "4318:4318" #http
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+#      - LOG_LEVEL=debug
+    networks:
+      - spring_ai
 
 networks:
   spring_ai:
     driver: bridge
+
+volumes:
+  ollama:
+    external: true # use existing volume
+  grafana-storage: {}

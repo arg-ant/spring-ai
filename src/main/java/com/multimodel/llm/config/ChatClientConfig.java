@@ -8,7 +8,6 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.ollama.OllamaChatModel;
-
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +30,11 @@ public class ChatClientConfig {
     @Bean("ollamaChatClient")
     public ChatClient ollamaChatClient(ChatClientFactory factory) {
         return factory.createOllama().build();
+    }
+
+    @Bean("bespokeMinicheckChatClient")
+    public ChatClient bespokeMinicheckChatClient(ChatClientFactory factory) {
+        return factory.createBespokeMinicheck().build();
     }
 
     @Bean("jdbcChatMemory")

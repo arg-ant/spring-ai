@@ -3,11 +3,9 @@ package com.multimodel.llm.controller;
 import com.multimodel.llm.exception.InvalidAnswerException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.evaluation.FactCheckingEvaluator;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -15,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
@@ -25,16 +26,16 @@ public class SelfEvaluatingChatController {
     private final ChatClient ollamaChatClient;
     private final FactCheckingEvaluator factCheckingEvaluator;
 
-
     //    hrPolicy used only in tests
     @Value("classpath:/promptTemplates/hrPolicy.st")
     Resource hrPolicyTemplate;
 
     public SelfEvaluatingChatController(
-            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient) {
+            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient,
+            @Qualifier("bespokeMinicheckChatClient") ChatClient bespokeMinicheckChatClient) {
         this.ollamaChatClient = ollamaChatClient;
-        ChatClient.Builder chatClientBuilder = this.ollamaChatClient.mutate();
-        this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
+        this.factCheckingEvaluator = FactCheckingEvaluator
+                .builder(bespokeMinicheckChatClient.mutate()).build();
     }
 
     @RequestMapping("/chat")
@@ -47,21 +48,30 @@ public class SelfEvaluatingChatController {
 
     @RequestMapping("/prompt-stuffing")
     public String promptStuff(@RequestParam("message") String message) {
-        return ollamaChatClient
+        String aiResponse = ollamaChatClient
                 .prompt(message)
-                .system(hrPolicyTemplate) // hrPolicy used only in tests
+                .system(hrPolicyTemplate)
                 .user(message)
                 .call()
                 .content();
+        try {
+            String hrPolicyContent = hrPolicyTemplate.getContentAsString(StandardCharsets.UTF_8);
+            validateAnswer(message, aiResponse, List.of(new Document(hrPolicyContent)));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return aiResponse;
     }
 
     private void validateAnswer(String message, String answer) {
-        EvaluationRequest evaluationRequest =
-                new EvaluationRequest(message, List.of(), answer);
+        validateAnswer(message, answer, List.of());
+    }
+
+    private void validateAnswer(String message, String answer, List<Document> context) {
+        EvaluationRequest evaluationRequest = new EvaluationRequest(message, context, answer);
         EvaluationResponse evaluationResponse = factCheckingEvaluator.evaluate(evaluationRequest);
         if (!evaluationResponse.isPass()) {
             throw new InvalidAnswerException(message, answer);
         }
     }
-
 }
