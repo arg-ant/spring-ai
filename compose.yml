@@ -37,16 +37,11 @@ services:
     networks:
         - spring_ai
 
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: jaeger
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
     ports:
-      - "16686:16686" # web ui
-      - "4317:4317" #grpc
-      - "4318:4318" #http
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-#      - LOG_LEVEL=debug
+      - "9411:9411"
     networks:
       - spring_ai
 

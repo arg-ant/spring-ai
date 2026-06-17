@@ -1,8 +1,9 @@
 package com.multimodel.llm.config;
 
-import com.multimodel.llm.advisors.TokenUsageLoggerAdvisor;
+import com.multimodel.llm.advisors.TokenLoggerAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -11,6 +12,8 @@ import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.stereotype.Component;
 
+import static com.multimodel.llm.config.Constants.*;
+
 @Component
 public class ChatClientFactory {
 
@@ -18,44 +21,57 @@ public class ChatClientFactory {
     private final OpenAiChatModel openAiChatModel;
     private final OllamaApi ollamaApi;
 
-    public ChatClientFactory(OllamaChatModel ollamaChatModel,
-                             OpenAiChatModel openAiChatModel,
-                             OllamaApi ollamaApi) {
+    public ChatClientFactory(
+            OllamaChatModel ollamaChatModel,
+            OpenAiChatModel openAiChatModel,
+            OllamaApi ollamaApi) {
         this.ollamaChatModel = ollamaChatModel;
         this.openAiChatModel = openAiChatModel;
         this.ollamaApi = ollamaApi;
     }
 
-    public ChatClient.Builder createOllama() {
-        return create(ollamaChatModel);
+    public ChatClient.Builder createOllama(Advisor... advisors) {
+        return create(ollamaChatModel, advisors);
     }
 
-    public ChatClient.Builder createOpenAi() {
-        return create(openAiChatModel);
+    public ChatClient.Builder createOpenAi(Advisor... advisors) {
+        return create(openAiChatModel, advisors);
     }
 
-    public ChatClient.Builder createBespokeMinicheck() {
+    public ChatClient.Builder createBespokeMinicheck(Advisor... advisors) {
+
         OllamaChatModel bespokeModel = OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
                 .defaultOptions(OllamaChatOptions.builder()
-                        .model("bespoke-minicheck")
+                        .model(IMAGE_MODEL)
                         .build())
                 .build();
-        return ChatClient.builder(bespokeModel);
+
+        return create(bespokeModel, advisors);
     }
 
-    public ChatClient.Builder create(ChatModel chatModel) {
-        return ChatClient.builder(chatModel)
+    public ChatClient.Builder create(
+            ChatModel chatModel,
+            Advisor... additionalAdvisors) {
+
+        ChatClient.Builder builder = ChatClient.builder(chatModel)
                 .defaultOptions(defaultChatOptions().mutate())
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
-                        new TokenUsageLoggerAdvisor());
+                        new TokenLoggerAdvisor()
+                );
+
+        if (additionalAdvisors != null && additionalAdvisors.length > 0) {
+            builder.defaultAdvisors(additionalAdvisors);
+        }
+
+        return builder;
     }
 
     private ChatOptions defaultChatOptions() {
         return ChatOptions.builder()
-                .temperature(0.7)
-                .maxTokens(250)
+                .temperature(TEMPERATURE)
+                .maxTokens(MAX_TOKENS)
                 .build();
     }
 }

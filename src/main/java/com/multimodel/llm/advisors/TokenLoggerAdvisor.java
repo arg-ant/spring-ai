@@ -9,9 +9,9 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
 
-public class TokenUsageLoggerAdvisor implements CallAdvisor {
+public class TokenLoggerAdvisor implements CallAdvisor {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenUsageLoggerAdvisor.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenLoggerAdvisor.class);
 
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
@@ -31,7 +31,7 @@ public class TokenUsageLoggerAdvisor implements CallAdvisor {
 
     @Override
     public String getName() {
-        return TokenUsageLoggerAdvisor.class.getSimpleName();
+        return TokenLoggerAdvisor.class.getSimpleName();
     }
 
     @Override

@@ -26,8 +26,7 @@ public class SelfEvaluatingChatController {
     private final ChatClient ollamaChatClient;
     private final FactCheckingEvaluator factCheckingEvaluator;
 
-    //    hrPolicy used only in tests
-    @Value("classpath:/promptTemplates/hrPolicy.st")
+    @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
     Resource hrPolicyTemplate;
 
     public SelfEvaluatingChatController(
@@ -42,7 +41,7 @@ public class SelfEvaluatingChatController {
     public String chat(@RequestParam("message") String message) {
         String aiResponse = ollamaChatClient.prompt(message)
                 .call().content();
-        validateAnswer(message, aiResponse);
+        validateAnswer(message, aiResponse, List.of());
         return aiResponse;
     }
 
@@ -63,13 +62,16 @@ public class SelfEvaluatingChatController {
         return aiResponse;
     }
 
-    private void validateAnswer(String message, String answer) {
-        validateAnswer(message, answer, List.of());
-    }
+    private void validateAnswer(String message,
+                                String answer,
+                                List<Document> context) {
 
-    private void validateAnswer(String message, String answer, List<Document> context) {
-        EvaluationRequest evaluationRequest = new EvaluationRequest(message, context, answer);
-        EvaluationResponse evaluationResponse = factCheckingEvaluator.evaluate(evaluationRequest);
+        EvaluationRequest evaluationRequest =
+                new EvaluationRequest(message, context, answer);
+
+        EvaluationResponse evaluationResponse =
+                factCheckingEvaluator.evaluate(evaluationRequest);
+
         if (!evaluationResponse.isPass()) {
             throw new InvalidAnswerException(message, answer);
         }

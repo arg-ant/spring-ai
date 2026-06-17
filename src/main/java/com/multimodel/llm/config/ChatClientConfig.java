@@ -1,61 +1,93 @@
 package com.multimodel.llm.config;
 
+
+import com.multimodel.llm.tools.TimeTools;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
+import org.springframework.web.client.RestClient;
+
+import static com.multimodel.llm.advisors.MemoryAdvisor.memoryAdvisor;
+import static com.multimodel.llm.advisors.WebSearchAdvisor.webSearchAdvisor;
+import static com.multimodel.llm.config.Constants.MAX_MESSAGES;
 
 @Configuration
 public class ChatClientConfig {
 
-    @Bean("defaultChatClient")
-    @Scope("prototype")
-    public ChatClient.Builder chatClientBuilder(OllamaChatModel ollamaChatModel) {
-        return ChatClient.builder(ollamaChatModel);
-    }
+    @Value("classpath:/promptTemplates/helpDeskSystemPromptTemplate.st")
+    private Resource helpDeskSystemPromptTemplate;
 
     @Bean("openAiChatClient")
-    public ChatClient openAiChatClient(ChatClientFactory factory) {
-        return factory.createOpenAi().build();
+    public ChatClient openAiChatClient(ChatClientFactory chatClientFactory) {
+        return chatClientFactory.createOpenAi().build();
     }
 
     @Bean("ollamaChatClient")
-    public ChatClient ollamaChatClient(ChatClientFactory factory) {
-        return factory.createOllama().build();
+    public ChatClient ollamaChatClient(ChatClientFactory chatClientFactory) {
+        return chatClientFactory.createOllama().build();
     }
 
     @Bean("bespokeMinicheckChatClient")
-    public ChatClient bespokeMinicheckChatClient(ChatClientFactory factory) {
-        return factory.createBespokeMinicheck().build();
+    public ChatClient bespokeMinicheckChatClient(ChatClientFactory chatClientFactory) {
+        return chatClientFactory.createBespokeMinicheck().build();
     }
 
     @Bean("jdbcChatMemory")
-    public ChatMemory chatMemoryWindowClient(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+    public ChatMemory messageWindowChatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
         return MessageWindowChatMemory.builder()
-                .maxMessages(10)
+                .maxMessages(MAX_MESSAGES)
                 .chatMemoryRepository(jdbcChatMemoryRepository)
                 .build();
     }
 
-    @Bean("chatMemoryClient")
-    public ChatClient memoryChatClient(ChatClient.Builder chatClientBuilder,
+    @Bean("memoryChatClient")
+    public ChatClient memoryChatClient(ChatClientFactory chatClientFactory,
+                                       ChatMemory chatMemory) {
+        return chatClientFactory
+                .createOllama(memoryAdvisor(chatMemory))
+                .build();
+    }
+
+    @Bean("ragMemoryChatClient")
+    public ChatClient ragMemoryChatClient(ChatClientFactory chatClientFactory,
                                        ChatMemory chatMemory,
                                        RetrievalAugmentationAdvisor ragAdvisor) {
-        Advisor loggerAdvisor = new SimpleLoggerAdvisor();
-        Advisor memoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
-        return chatClientBuilder
-                .defaultAdvisors(
-                        memoryAdvisor,
-                        ragAdvisor,
-                        loggerAdvisor)
+        return chatClientFactory
+                .createOllama(memoryAdvisor(chatMemory), ragAdvisor)
+                .build();
+    }
+
+    @Bean("timeChatClient")
+    public ChatClient timeChatClient(ChatClientFactory chatClientFactory,
+                                     TimeTools timeTools) {
+        return chatClientFactory
+                .createOllama()
+                .defaultTools(timeTools)
+                .build();
+    }
+
+    @Bean("helpDeskChatClient")
+    public ChatClient helpDeskChatClient(ChatClientFactory chatClientFactory,
+                                         ChatMemory chatMemory,
+                                         TimeTools timeTools) {
+        return chatClientFactory
+                .createOllama(memoryAdvisor(chatMemory))
+                .defaultSystem(helpDeskSystemPromptTemplate)
+                .defaultTools(timeTools).build();
+    }
+
+    @Bean("webSearchChatClient")
+    public ChatClient webSearchChatClient(ChatClientFactory chatClientFactory,
+                                          ChatMemory chatMemory,
+                                          RestClient.Builder restClientBuilder) {
+        return chatClientFactory
+                .createOllama(memoryAdvisor(chatMemory), webSearchAdvisor(restClientBuilder))
                 .build();
     }
 }

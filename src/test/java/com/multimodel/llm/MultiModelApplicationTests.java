@@ -1,19 +1,15 @@
 package com.multimodel.llm;
 
 import com.multimodel.llm.config.ChatClientFactory;
-import com.multimodel.llm.config.WebSearchRagChatClientConfig;
 import com.multimodel.llm.controller.MultiModelChatController;
 import com.multimodel.llm.controller.RagController;
-
 import org.junit.jupiter.api.*;
 import org.springframework.ai.chat.client.ChatClient;
-
 import org.springframework.ai.chat.evaluation.FactCheckingEvaluator;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
-
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +34,7 @@ class MultiModelApplicationTests {
     private VectorStore vectorStore;
 
     @MockitoBean
-    private WebSearchRagChatClientConfig webSearchRagChatClientConfig;
+    private ChatClient webSearchChatClient;
 
     @MockitoBean
     private RagController ragController;
@@ -56,7 +52,7 @@ class MultiModelApplicationTests {
     @Value("${test.relevancy.min-score:0.7}")
     private float minRelevancyScore;
 
-    @Value("classpath:/promptTemplates/hrPolicy.st")
+    @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
     Resource hrPolicyTemplate;
 
     @BeforeEach
@@ -71,7 +67,7 @@ class MultiModelApplicationTests {
 
     @Test
     @DisplayName("Should return relevant response for basic geography question")
-//    @Timeout(value = 30) // 30 seconds timeout commented because local Ollama model is too slow
+//    @Timeout(value = 100)
     void evaluateChatControllerResponseRelevancy() {
         // Given
         String question = "What is the capital of India ?";

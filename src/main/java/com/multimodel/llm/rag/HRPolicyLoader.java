@@ -8,12 +8,17 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+import static com.multimodel.llm.config.Constants.CHUNK_SIZE;
+import static com.multimodel.llm.config.Constants.MAX_NUM_CHUNKS;
+
+//@Component
 public class HRPolicyLoader {
+
+    @Value("classpath:HR_Policies.pdf")
+    private Resource policyFile;
 
     private final VectorStore vectorStore;
 
@@ -21,11 +26,8 @@ public class HRPolicyLoader {
         this.vectorStore = vectorStore;
     }
 
-    @Value("classpath:Eazybytes_HR_Policies.pdf")
-    Resource policyFile;
-
     // Execute this method automatically once after Spring creates the bean
-// Commonly used for initialization logic such as loading data into a vector store
+    // Commonly used for initialization logic such as loading data into a vector store
     @PostConstruct
     public void loadPDF() {
 
@@ -38,11 +40,11 @@ public class HRPolicyLoader {
         TextSplitter textSplitter =
                 TokenTextSplitter.builder()
 
-                        .withChunkSize(200)
+                        .withChunkSize(CHUNK_SIZE)
                         // Split the document into chunks of approximately 200 tokens
                         // Smaller chunks typically improve retrieval quality
 
-                        .withMaxNumChunks(400)
+                        .withMaxNumChunks(MAX_NUM_CHUNKS)
                         // Limit the total number of generated chunks
                         // Prevents very large documents from creating excessive embeddings
 

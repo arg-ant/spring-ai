@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.multimodel.llm.config.Constants.*;
+
 @RestController
 @RequestMapping("/api")
 public class ImageController {
@@ -29,10 +31,10 @@ public class ImageController {
     String generateImageWithOptions(@RequestParam("message") String message) {
         var imageResponse = imageModel.call(new ImagePrompt(message,
                 OpenAiImageOptions.builder()
-                        .N(1)
-                        .quality("auto")
-                        .height(1024)
-                        .width(1024)
+                        .N(IMAGES_NR)
+                        .quality(IMAGE_QUALITY)
+                        .height(IMAGE_HEIGHT)
+                        .width(IMAGE_WIDTH)
                         .build()));
         return imageResponse.getResults().getFirst().getOutput().getB64Json();
     }

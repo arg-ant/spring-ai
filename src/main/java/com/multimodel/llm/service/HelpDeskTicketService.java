@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.multimodel.llm.config.Constants.TICKET_STATUS_OPEN;
+
 @Service
 @RequiredArgsConstructor
 public class HelpDeskTicketService {
@@ -19,7 +21,7 @@ public class HelpDeskTicketService {
         HelpDeskTicket ticket = HelpDeskTicket.builder()
                 .issue(ticketInput.issue())
                 .username(username)
-                .status("OPEN")
+                .status(TICKET_STATUS_OPEN)
                 .createdAt(LocalDateTime.now())
                 .eta(LocalDateTime.now().plusDays(7))
                 .build();
