@@ -57,9 +57,10 @@ class MultiModelApplicationTests {
 
     @BeforeEach
     void setup() {
-        ChatClient.Builder chatClientBuilder = chatClientFactory.createOllama();
+        ChatClient.Builder chatClientBuilder = chatClientFactory.createBespokeMinicheck();
         this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder
-                .defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation."));
+//                .defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation.")
+        );
         this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
 //        #TODO check BESPOKE_MINICHECK implementation
 //        this.factCheckingEvaluator = FactCheckingEvaluator.forBespokeMinicheck(chatClientBuilder);

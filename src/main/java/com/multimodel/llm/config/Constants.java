@@ -4,7 +4,7 @@ public class Constants {
 
     public static double TEMPERATURE = 0.7;
     public static int MAX_TOKENS = 250;
-    public static String IMAGE_MODEL = "bespoke-minicheck";
+    public static String BESPOKE_MINICHECK_MODEL = "bespoke-minicheck";
     public static int MAX_MESSAGES = 10;
     public static String LANGUAGE = "english";
     public static int TOP_K = 3;

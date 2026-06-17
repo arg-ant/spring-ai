@@ -38,16 +38,15 @@ public class ChatClientFactory {
         return create(openAiChatModel, advisors);
     }
 
-    public ChatClient.Builder createBespokeMinicheck(Advisor... advisors) {
-
+    public ChatClient.Builder createBespokeMinicheck() {
         OllamaChatModel bespokeModel = OllamaChatModel.builder()
                 .ollamaApi(ollamaApi)
                 .defaultOptions(OllamaChatOptions.builder()
-                        .model(IMAGE_MODEL)
+                        .model(BESPOKE_MINICHECK_MODEL)
                         .build())
                 .build();
 
-        return create(bespokeModel, advisors);
+        return create(bespokeModel);
     }
 
     public ChatClient.Builder create(
