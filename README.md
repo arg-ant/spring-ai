@@ -188,4 +188,4 @@ Key constants (`Constants.java`):
 - **Metrics**: Exposed at `/actuator/prometheus`, scraped by Prometheus
 - **Tracing**: 100% sampling (`management.tracing.sampling.probability=1.0`), exported to Zipkin
 - **Token usage**: Logged per request by `TokenLoggerAdvisor`
-- **H2 Console**: Available at `/h2-console` (enabled in dev)
+- **H2 Console**: Available at `/h2-console`
