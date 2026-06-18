@@ -1,7 +1,6 @@
 package com.multimodel.llm.controller;
 
 import com.multimodel.llm.model.CountryCities;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
@@ -18,12 +17,25 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.Map;
 
+import static com.multimodel.llm.config.Constants.CUSTOMER_MESSAGE_PLACEHOLDER;
+import static com.multimodel.llm.config.Constants.CUSTOMER_NAME_PLACEHOLDER;
+
 @RestController
 @RequestMapping("/api")
 public class MultiModelChatController {
 
+    @Value("classpath:/promptTemplates/userPromptTemplate.st")
+    Resource userPromptTemplate;
+
+    @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
+    private Resource hrPolicyTemplate;
+
+    @Value("classpath:/promptTemplates/systemPromptTemplate.st")
+    private Resource systemPromptTemplate;
+
     private final ChatClient openAiChatClient;
     private final ChatClient ollamaChatClient;
+
 
     public MultiModelChatController(
             @Qualifier("openAiChatClient") ChatClient openAiChatClient,
@@ -42,46 +54,34 @@ public class MultiModelChatController {
         return ollamaChatClient.prompt(message).call().content();
     }
 
-    @Value("classpath:/prompttemplates/userPromptTemplate.st")
-    Resource promptTemplate;
-
-    //custom prompt with parameters for Ollama model
     @RequestMapping("/email")
-    public String ollamaEmail(
+    public String email(
             @RequestParam("customerName") String customerName,
             @RequestParam("customerMessage") String customerMessage) {
 
         return ollamaChatClient
                 .prompt(customerName)
-                .system(promptTemplate)
+                .system(userPromptTemplate)
                 .user(promptTemplateSpec ->
-                        promptTemplateSpec.text(promptTemplate)
-                                .param("customerName", customerName)
-                                .param("customerMessage", customerMessage))
+                        promptTemplateSpec.text(userPromptTemplate)
+                                .param(CUSTOMER_NAME_PLACEHOLDER, customerName)
+                                .param(CUSTOMER_MESSAGE_PLACEHOLDER, customerMessage))
                 .call()
                 .content();
     }
-
-    @Value("classpath:/promptTemplates/systemPromptTemplate.st")
-    Resource systemPromptTemplate;
-
-//    hrPolicy used only in tests
-    @Value("classpath:/promptTemplates/hrPolicy.st")
-    Resource hrPolicyTemplate;
 
     @RequestMapping("/prompt-stuffing")
     public String promptStuff(@RequestParam("message") String message) {
         return ollamaChatClient
                 .prompt(message)
-                .system(hrPolicyTemplate) // hrPolicy used only in tests
-//                .system(systemPromptTemplate) //system prompt used in development
+                .system(hrPolicyTemplate)
                 .user(message)
                 .call()
                 .content();
     }
 
     @RequestMapping("/stream")
-    public Flux<String> ollamaStream(@RequestParam("message") String message) {
+    public Flux<String> stream(@RequestParam("message") String message) {
         return ollamaChatClient
                 .prompt()
                 .user(message)

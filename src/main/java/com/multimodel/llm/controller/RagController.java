@@ -1,5 +1,6 @@
 package com.multimodel.llm.controller;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -13,39 +14,38 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.multimodel.llm.config.Constants.*;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 @RestController
 @RequestMapping("/api/rag")
 public class RagController {
 
-    private final ChatClient chatMemoryClient;
+    @Value("classpath:/promptTemplates/systemPromptTemplate.st")
+    private Resource systemPromptTemplate;
+
+    private final ChatClient ragChatMemoryClient;
     private final ChatClient webSearchChatClient;
     private final VectorStore vectorStore;
 
-    @Value("classpath:/promptTemplates/systemPromptRandomDataTemplate.st")
-    Resource promptTemplate;
 
-    @Value("classpath:/promptTemplates/systemPromptTemplate.st")
-    Resource hrSystemTemplate;
-
-    public RagController(@Qualifier("chatMemoryClient") ChatClient chatMemoryClient,
-                         @Qualifier("webSearchRagChatClient")ChatClient webSearchChatClient,
+    public RagController(@Qualifier("ragMemoryChatClient") ChatClient ragChatMemoryClient,
+                         @Qualifier("webSearchChatClient")ChatClient webSearchChatClient,
                          VectorStore vectorStore) {
-        this.chatMemoryClient = chatMemoryClient;
+        this.ragChatMemoryClient = ragChatMemoryClient;
         this.webSearchChatClient = webSearchChatClient;
         this.vectorStore = vectorStore;
     }
 
     @GetMapping("/random/chat")
-    public ResponseEntity<String> randomChat(
+    public ResponseEntity<@NonNull String> randomChat(
             @RequestHeader("username") String username,
             @RequestParam("message") String message) {
 
         SearchRequest searchRequest = SearchRequest.builder()
                 .query(message)                  // Convert the user's question into an embedding and use it for vector search
-                .topK(3)                         // Return at most 3 most similar documents
-                .similarityThreshold(0.5)        // Ignore documents with similarity below 50%
+                .topK(TOP_K)                         // Return at most 3 most similar documents
+                .similarityThreshold(SIMILARITY_THRESHOLD)        // Ignore documents with similarity below 50%
                 .build();
 
         List<Document> similarDocs =
@@ -55,11 +55,11 @@ public class RagController {
                 .map(Document::getText)                     // Extract text from each retrieved document
                 .collect(Collectors.joining(System.lineSeparator())); // Merge all document texts into a single context string
 
-        String answer = chatMemoryClient.prompt()
+        String answer = ragChatMemoryClient.prompt()
 
                 .system(promptSystemSpec -> promptSystemSpec
-                        .text(promptTemplate)               // Load the system prompt template
-                        .param("documents", similarContext)) // Replace {documents} placeholder with retrieved context
+                        .text(systemPromptTemplate)               // Load the system prompt template
+                        .param(DOCUMENTS_PLACEHOLDER, similarContext)) // Replace {documents} placeholder with retrieved context
 
                 .advisors(a -> a.param(CONVERSATION_ID, username))
                 // Use username as conversation ID so previous messages can be remembered
@@ -77,17 +77,7 @@ public class RagController {
     @GetMapping("/document/chat")
     public ResponseEntity<String> documentChat(@RequestHeader("username") String username,
                                              @RequestParam("message") String message) {
-
-        // below code not needed as it is done by RetrievalAugmentationAdvisor coming from ollamaMemoryChatClient()
-        //        SearchRequest searchRequest =
-//                SearchRequest.builder().query(message).topK(3).similarityThreshold(0.5).build();
-//        List<Document> similarDocs =  vectorStore.similaritySearch(searchRequest);
-//        String similarContext = similarDocs.stream()
-//                .map(Document::getText)
-//                .collect(Collectors.joining(System.lineSeparator()));
-        String answer = chatMemoryClient.prompt()
-//                .system(promptSystemSpec -> promptSystemSpec.text(hrSystemTemplate)
-//                        .param("documents", similarContext))
+        String answer = ragChatMemoryClient.prompt()
                 .advisors(a -> a.param(CONVERSATION_ID, username))
                 .user(message)
                 .call().content();
@@ -95,7 +85,7 @@ public class RagController {
     }
 
     @GetMapping("/web-search/chat")
-    public ResponseEntity<String> webSearchChat(@RequestHeader("username") String username,
+    public ResponseEntity<@NonNull String> webSearchChat(@RequestHeader("username") String username,
                                                @RequestParam("message") String message) {
         String answer = webSearchChatClient.prompt()
                 .advisors(a -> a.param(CONVERSATION_ID, username))

@@ -26,8 +26,7 @@ public class SelfEvaluatingChatController {
     private final ChatClient ollamaChatClient;
     private final FactCheckingEvaluator factCheckingEvaluator;
 
-    //    hrPolicy used only in tests
-    @Value("classpath:/promptTemplates/hrPolicy.st")
+    @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
     Resource hrPolicyTemplate;
 
     public SelfEvaluatingChatController(
@@ -40,10 +39,10 @@ public class SelfEvaluatingChatController {
 
     @RequestMapping("/chat")
     public String chat(@RequestParam("message") String message) {
-        String aiResponse = ollamaChatClient.prompt(message)
+        String aiResponse = ollamaChatClient
+                .prompt(message)
                 .call().content();
-        validateAnswer(message, aiResponse);
-        return aiResponse;
+        return validateAnswer(message, aiResponse, List.of());
     }
 
     @RequestMapping("/prompt-stuffing")
@@ -60,18 +59,22 @@ public class SelfEvaluatingChatController {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return aiResponse;
+        return validateAnswer(message, aiResponse, List.of());
     }
 
-    private void validateAnswer(String message, String answer) {
-        validateAnswer(message, answer, List.of());
-    }
+    private String validateAnswer(String message,
+                                  String answer,
+                                  List<Document> context) {
 
-    private void validateAnswer(String message, String answer, List<Document> context) {
-        EvaluationRequest evaluationRequest = new EvaluationRequest(message, context, answer);
-        EvaluationResponse evaluationResponse = factCheckingEvaluator.evaluate(evaluationRequest);
+        EvaluationRequest evaluationRequest =
+                new EvaluationRequest(message, context, answer);
+
+        EvaluationResponse evaluationResponse =
+                factCheckingEvaluator.evaluate(evaluationRequest);
+
         if (!evaluationResponse.isPass()) {
             throw new InvalidAnswerException(message, answer);
         }
+        return answer;
     }
 }

@@ -39,13 +39,6 @@ public class TavilyWebSearchDocumentRetriever implements DocumentRetriever {
         this.resultLimit = resultLimit;
     }
 
-    /**
-     * Retrieves relevant documents from an underlying data source based on the given
-     * query.
-     *
-     * @param query The query to use for retrieving documents
-     * @return The list of relevant documents
-     */
     @Override
     public List<Document> retrieve(Query query) {
         logger.info("Processing query: {}", query.text());

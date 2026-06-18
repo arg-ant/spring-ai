@@ -1,19 +1,15 @@
 package com.multimodel.llm;
 
 import com.multimodel.llm.config.ChatClientFactory;
-import com.multimodel.llm.config.WebSearchRagChatClientConfig;
 import com.multimodel.llm.controller.MultiModelChatController;
 import com.multimodel.llm.controller.RagController;
-
 import org.junit.jupiter.api.*;
 import org.springframework.ai.chat.client.ChatClient;
-
 import org.springframework.ai.chat.evaluation.FactCheckingEvaluator;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
-
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +34,7 @@ class MultiModelApplicationTests {
     private VectorStore vectorStore;
 
     @MockitoBean
-    private WebSearchRagChatClientConfig webSearchRagChatClientConfig;
+    private ChatClient webSearchChatClient;
 
     @MockitoBean
     private RagController ragController;
@@ -56,22 +52,19 @@ class MultiModelApplicationTests {
     @Value("${test.relevancy.min-score:0.7}")
     private float minRelevancyScore;
 
-    @Value("classpath:/promptTemplates/hrPolicy.st")
+    @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
     Resource hrPolicyTemplate;
 
     @BeforeEach
     void setup() {
-        ChatClient.Builder chatClientBuilder = chatClientFactory.createOllama();
-        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder
-                .defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation."));
+        ChatClient.Builder chatClientBuilder = chatClientFactory.createBespokeMinicheck();
+        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder);
         this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
-//        #TODO check BESPOKE_MINICHECK implementation
-//        this.factCheckingEvaluator = FactCheckingEvaluator.forBespokeMinicheck(chatClientBuilder);
     }
 
     @Test
     @DisplayName("Should return relevant response for basic geography question")
-//    @Timeout(value = 30) // 30 seconds timeout commented because local Ollama model is too slow
+//    @Timeout(value = 100)
     void evaluateChatControllerResponseRelevancy() {
         // Given
         String question = "What is the capital of India ?";
@@ -105,7 +98,6 @@ class MultiModelApplicationTests {
 
     @Test
     @DisplayName("Should return factually correct response for gravity-related question")
-    @Timeout(value = 300)
     void evaluateFactAccuracyForGravityQuestion() {
         // Given
         String question = "Who discovered the law of universal gravitation?";
@@ -130,7 +122,6 @@ class MultiModelApplicationTests {
 
     @Test
     @DisplayName("Should correctly evaluate factual response based on HR policy context (RAG scenario)")
-    @Timeout(value = 300)
     public void evaluateHrPolicyAnswerWithRagContext() throws IOException {
         // Given
         String question = "How many paid leaves do employees get annually?";

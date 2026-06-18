@@ -1,6 +1,8 @@
 package com.multimodel.llm.controller;
 
 import com.openai.models.audio.AudioResponseFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.audio.transcription.TranscriptionModel;
@@ -26,6 +28,8 @@ import java.nio.file.Paths;
 @RequestMapping("/api")
 public class AudioController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AudioController.class);
+
     private final TranscriptionModel transcriptionModel;
     private final TextToSpeechModel textToSpeechModel;
 
@@ -34,13 +38,6 @@ public class AudioController {
         this.transcriptionModel = transcriptionModel;
         this.textToSpeechModel = textToSpeechModel;
     }
-
-    /**
-     * Transcribes audio content from a provided audio file resource.
-     *
-     * @param audioFile the audio file resource to be transcribed, typically resolved from the classpath
-     * @return the transcribed text content from the given audio file
-     */
 
     @GetMapping("/transcribe")
     String transcribe(@Value("classpath:SpringAI.mp3") Resource audioFile) {
@@ -75,33 +72,40 @@ public class AudioController {
         return response.getResult().getOutput();
     }
 
-    // converts text to speech and saves the resulting audio as an MP3 file
     @GetMapping("/speech")
     String speech(@RequestParam("message") String message) throws IOException {
         // @RequestParam binds the "message" query param (e.g. /api/speech?message=Hello) to the text to synthesize
+        Path path = Paths.get("output.mp3");
+
+        deleteIfPresent(path);
 
         // Call the text-to-speech model with the input text; returns raw audio bytes (MP3-encoded by default)
         byte[] audioBytes = textToSpeechModel.call(message);
-
-        // Define the target file path (relative to the application's working directory)
-        Path path = Paths.get("output.mp3");
-
         // Write the audio bytes to disk, creating or overwriting "output.mp3"
         Files.write(path, audioBytes);
-
         // Return a confirmation message including the absolute path of the saved file
         return "MP3 saved successfully to " + path.toAbsolutePath();
     }
 
     @GetMapping("/speech-options")
     String speechWithOptions(@RequestParam("message") String message) throws IOException {
+        Path path = Paths.get("speech-options.mp3");
+
+        deleteIfPresent(path);
+
         TextToSpeechResponse speechResponse = textToSpeechModel.call(new TextToSpeechPrompt(message,
                 OpenAiAudioSpeechOptions.builder().voice(OpenAiAudioSpeechOptions.Voice.NOVA.getValue())
                         .speed(2.0)
                         .responseFormat(OpenAiAudioSpeechOptions.AudioResponseFormat.MP3.getValue()).build()));
-        Path path = Paths.get("speech-options.mp3");
+
         Files.write(path, speechResponse.getResult().getOutput());
         return "MP3 saved successfully to " + path.toAbsolutePath();
+    }
+
+    private void deleteIfPresent(Path path) throws IOException {
+        if (Files.deleteIfExists(path)) {
+            logger.info("Deleted existing file at {}", path.toAbsolutePath());
+        }
     }
 
 }
