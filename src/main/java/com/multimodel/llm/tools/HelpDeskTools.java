@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HelpDeskTools {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HelpDeskTools.class);
+    private static final Logger logger = LoggerFactory.getLogger(HelpDeskTools.class);
 
     private final HelpDeskTicketService service;
 
@@ -34,9 +34,9 @@ public class HelpDeskTools {
                         ToolContext toolContext) {
 
         String username = (String) toolContext.getContext().get("username");
-        LOGGER.info("Creating support ticket for user: {} with details: {}", username, ticketRequest);
+        logger.info("Creating support ticket for user: {} with details: {}", username, ticketRequest);
         HelpDeskTicket savedTicket = service.createTicket(ticketRequest, username);
-        LOGGER.info("Ticket created successfully. Ticket ID: {}, Username: {}", savedTicket.getId(), savedTicket.getUsername());
+        logger.info("Ticket created successfully. Ticket ID: {}, Username: {}", savedTicket.getId(), savedTicket.getUsername());
 
         return "Ticket #" + savedTicket.getId() + " created successfully for user " + savedTicket.getUsername();
     }
@@ -44,9 +44,9 @@ public class HelpDeskTools {
     @Tool(description = "Fetch the status of the tickets based on a given username")
     List<HelpDeskTicket> getTicketStatus(ToolContext toolContext) {
         String username = (String) toolContext.getContext().get("username");
-        LOGGER.info("Fetching tickets for user: {}", username);
+        logger.info("Fetching tickets for user: {}", username);
         List<HelpDeskTicket> tickets = service.getTicketsByUsername(username);
-        LOGGER.info("Found {} tickets for user: {}", tickets.size(), username);
+        logger.info("Found {} tickets for user: {}", tickets.size(), username);
         // throw new RuntimeException("Unable to fetch ticket status");
 
         return tickets;

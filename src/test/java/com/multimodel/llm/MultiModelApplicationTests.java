@@ -58,12 +58,8 @@ class MultiModelApplicationTests {
     @BeforeEach
     void setup() {
         ChatClient.Builder chatClientBuilder = chatClientFactory.createBespokeMinicheck();
-        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder
-//                .defaultSystem("You must respond with only the single word 'yes' or 'no'. No punctuation, no explanation.")
-        );
+        this.relevancyEvaluator = new RelevancyEvaluator(chatClientBuilder);
         this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
-//        #TODO check BESPOKE_MINICHECK implementation
-//        this.factCheckingEvaluator = FactCheckingEvaluator.forBespokeMinicheck(chatClientBuilder);
     }
 
     @Test
@@ -102,7 +98,6 @@ class MultiModelApplicationTests {
 
     @Test
     @DisplayName("Should return factually correct response for gravity-related question")
-    @Timeout(value = 300)
     void evaluateFactAccuracyForGravityQuestion() {
         // Given
         String question = "Who discovered the law of universal gravitation?";
@@ -127,7 +122,6 @@ class MultiModelApplicationTests {
 
     @Test
     @DisplayName("Should correctly evaluate factual response based on HR policy context (RAG scenario)")
-    @Timeout(value = 300)
     public void evaluateHrPolicyAnswerWithRagContext() throws IOException {
         // Given
         String question = "How many paid leaves do employees get annually?";

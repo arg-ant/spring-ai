@@ -17,14 +17,12 @@ public class TokenLoggerAdvisor implements CallAdvisor {
     public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
         ChatClientResponse chatClientResponse = callAdvisorChain.nextCall(chatClientRequest);
         ChatResponse chatResponse = chatClientResponse.chatResponse();
-        if (chatResponse != null && chatResponse.getMetadata() != null) {
+        if (chatResponse != null) {
             Usage usage = chatResponse.getMetadata().getUsage();
-            if (usage != null) {
-                logger.info("Token usage — prompt: {}, generation: {}, total: {}",
-                        usage.getPromptTokens(),
-                        usage.getCompletionTokens(),
-                        usage.getTotalTokens());
-            }
+            logger.info("Token usage — prompt: {}, generation: {}, total: {}",
+                    usage.getPromptTokens(),
+                    usage.getCompletionTokens(),
+                    usage.getTotalTokens());
         }
         return chatClientResponse;
     }
