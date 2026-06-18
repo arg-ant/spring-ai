@@ -39,10 +39,10 @@ public class SelfEvaluatingChatController {
 
     @RequestMapping("/chat")
     public String chat(@RequestParam("message") String message) {
-        String aiResponse = ollamaChatClient.prompt(message)
+        String aiResponse = ollamaChatClient
+                .prompt(message)
                 .call().content();
-        validateAnswer(message, aiResponse, List.of());
-        return aiResponse;
+        return validateAnswer(message, aiResponse, List.of());
     }
 
     @RequestMapping("/prompt-stuffing")
@@ -59,12 +59,12 @@ public class SelfEvaluatingChatController {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return aiResponse;
+        return validateAnswer(message, aiResponse, List.of());
     }
 
-    private void validateAnswer(String message,
-                                String answer,
-                                List<Document> context) {
+    private String validateAnswer(String message,
+                                  String answer,
+                                  List<Document> context) {
 
         EvaluationRequest evaluationRequest =
                 new EvaluationRequest(message, context, answer);
@@ -75,5 +75,6 @@ public class SelfEvaluatingChatController {
         if (!evaluationResponse.isPass()) {
             throw new InvalidAnswerException(message, answer);
         }
+        return answer;
     }
 }
