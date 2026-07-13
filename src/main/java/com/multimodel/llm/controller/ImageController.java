@@ -10,16 +10,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.multimodel.llm.config.Constants.*;
 
+/**
+ * REST controller exposing image generation endpoints backed by Spring AI's {@link ImageModel}.
+ */
 @RestController
 @RequestMapping("/api")
 public class ImageController {
 
     private final ImageModel imageModel;
 
+    /**
+     * Creates a new controller backed by the given image model.
+     *
+     * @param imageModel the model used to generate images
+     */
     public ImageController(ImageModel imageModel) {
         this.imageModel = imageModel;
     }
 
+    /**
+     * Generates an image from the given text prompt using default options.
+     *
+     * @param message the text prompt describing the desired image, bound from the {@code message} query parameter
+     * @return the generated image as a base64-encoded JSON string
+     */
     @GetMapping("/image")
     String generateImage(@RequestParam("message") String message) {
         var imageResponse = imageModel.call(new ImagePrompt(message));
@@ -27,6 +41,13 @@ public class ImageController {
 
     }
 
+    /**
+     * Generates an image from the given text prompt using OpenAI-specific options (image
+     * count, quality, height, and width, as configured in {@link com.multimodel.llm.config.Constants}).
+     *
+     * @param message the text prompt describing the desired image, bound from the {@code message} query parameter
+     * @return the generated image as a base64-encoded JSON string
+     */
     @GetMapping("/image-options")
     String generateImageWithOptions(@RequestParam("message") String message) {
         var imageResponse = imageModel.call(new ImagePrompt(message,

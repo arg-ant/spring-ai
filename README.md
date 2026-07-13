@@ -183,6 +183,20 @@ Key constants (`Constants.java`):
 | Max web search results | 3 |
 | Image size | 1024×1024 |
 
+## Resources (`src/main/resources`)
+
+| File | Purpose |
+|---|---|
+| `application.properties` | Spring Boot configuration: datasource, AI provider settings, actuator/metrics, and tracing |
+| `schema/schema-h2db.sql` | DDL for the `SPRING_AI_CHAT_MEMORY` table backing JDBC-based conversation memory |
+| `HR_Policies.pdf` | Sample HR policy document, loaded into the vector store by `HRPolicyLoader` for RAG demos |
+| `SpringAI.mp3` | Sample audio clip used by `AudioController`'s transcription endpoints |
+| `promptTemplates/systemPromptTemplate.st` | System prompt (with `{documents}` placeholder) used for HR-policy RAG chat in `RagController#randomChat` |
+| `promptTemplates/systemPromptRandomDataTemplate.st` | System prompt template (with `{documents}` placeholder) intended for RAG over the `RandomDataLoader` sentence dataset; currently unreferenced in code |
+| `promptTemplates/hrPolicyTemplate.st` | HR policy summary (leave, working hours, benefits, etc.) used as the system prompt for prompt-stuffing demos in `MultiModelChatController#promptStuff` and `SelfEvaluatingChatController#promptStuff` |
+| `promptTemplates/helpDeskSystemPromptTemplate.st` | System prompt defining the virtual help-desk assistant persona and ticket-handling rules, used by the `helpDeskChatClient` bean |
+| `promptTemplates/userPromptTemplate.st` | Template (with `{customerName}`/`{customerMessage}` placeholders) for generating customer support emails in `MultiModelChatController#email` |
+
 ## Observability
 
 - **Metrics**: Exposed at `/actuator/prometheus`, scraped by Prometheus

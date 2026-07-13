@@ -14,20 +14,43 @@ import java.util.List;
 import static com.multimodel.llm.config.Constants.CHUNK_SIZE;
 import static com.multimodel.llm.config.Constants.MAX_NUM_CHUNKS;
 
+/**
+ * Loads the HR policies PDF into the {@link VectorStore} on application startup so it can be
+ * retrieved for RAG (retrieval-augmented generation) queries.
+ * <p>
+ * Currently disabled as a Spring bean (the {@code @Component} annotation is commented out);
+ * enable it to have the policy document indexed automatically at startup.
+ */
 //@Component
 public class HRPolicyLoader {
 
+    /**
+     * The HR policies PDF resource, resolved from the classpath.
+     */
     @Value("classpath:HR_Policies.pdf")
     private Resource policyFile;
 
+    /**
+     * Vector store used to persist embedded document chunks for later retrieval.
+     */
     private final VectorStore vectorStore;
 
+    /**
+     * Creates a new loader backed by the given vector store.
+     *
+     * @param vectorStore the vector store where document embeddings will be saved
+     */
     public HRPolicyLoader(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
-    // Execute this method automatically once after Spring creates the bean
-    // Commonly used for initialization logic such as loading data into a vector store
+    /**
+     * Reads the HR policies PDF, splits it into token-based chunks, and stores the resulting
+     * embeddings in the vector store.
+     * <p>
+     * Executed automatically once after Spring creates the bean, since this method is
+     * annotated with {@link PostConstruct}.
+     */
     @PostConstruct
     public void loadPDF() {
 

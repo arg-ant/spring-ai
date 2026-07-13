@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Spring AI tools exposing help-desk ticket operations (creation and status lookup) that the
+ * help-desk {@code ChatClient} can invoke on behalf of the requesting user. The requesting
+ * username is expected to be supplied via the tool context (see
+ * {@code HelpDeskController#helpDesk}).
+ */
 @Component
 @RequiredArgsConstructor
 public class HelpDeskTools {
@@ -21,6 +27,16 @@ public class HelpDeskTools {
 
     private final HelpDeskTicketService service;
 
+    /**
+     * Creates a new help-desk ticket for the current user. Invoked by the model only when the
+     * user explicitly requests to open a ticket; its result is returned directly to the user,
+     * bypassing further model processing.
+     *
+     * @param ticketRequest the ticket details supplied by the model, with a mandatory issue field
+     * @param toolContext the tool invocation context, expected to contain the requesting
+     *                    {@code username}
+     * @return a confirmation message including the new ticket's ID and username
+     */
     @Tool(name = "createTicket",
             description = """
                     If user explicitly requests to create a helpdesk ticket,
@@ -41,6 +57,13 @@ public class HelpDeskTools {
         return "Ticket #" + savedTicket.getId() + " created successfully for user " + savedTicket.getUsername();
     }
 
+    /**
+     * Fetches all help-desk tickets belonging to the current user.
+     *
+     * @param toolContext the tool invocation context, expected to contain the requesting
+     *                    {@code username}
+     * @return the list of tickets raised by that user, empty if none exist
+     */
     @Tool(description = "Fetch the status of the tickets based on a given username")
     List<HelpDeskTicket> getTicketStatus(ToolContext toolContext) {
         String username = (String) toolContext.getContext().get("username");

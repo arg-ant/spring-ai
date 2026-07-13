@@ -7,15 +7,37 @@ import org.springframework.ai.vectorstore.VectorStore;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Loads a fixed set of unrelated, general-knowledge sentences into the {@link VectorStore}
+ * on application startup, for use as sample/test data in RAG retrieval.
+ * <p>
+ * Currently disabled as a Spring bean (the {@code @Component} annotation is commented out);
+ * enable it to have the sentences indexed automatically at startup.
+ */
 //@Component
 public class RandomDataLoader {
 
+    /**
+     * Vector store used to persist embedded sentence documents for later retrieval.
+     */
     private final VectorStore vectorStore;
 
+    /**
+     * Creates a new loader backed by the given vector store.
+     *
+     * @param vectorStore the vector store where document embeddings will be saved
+     */
     public RandomDataLoader(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
+    /**
+     * Wraps each sample sentence in a {@link Document} and stores it, along with its
+     * embedding, in the vector store.
+     * <p>
+     * Executed automatically once after Spring creates the bean, since this method is
+     * annotated with {@link PostConstruct}.
+     */
     @PostConstruct
     public void loadSentencesIntoVectorStore() {
         List<String> sentences = List.of(

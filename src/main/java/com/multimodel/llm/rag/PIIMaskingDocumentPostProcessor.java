@@ -11,21 +11,31 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * A {@link DocumentPostProcessor} that redacts personally identifiable information (PII) —
+ * email addresses and phone numbers — from retrieved documents before they are passed
+ * further down the RAG pipeline (e.g. into a prompt).
+ * <p>
+ * Instances are obtained via the static {@link #builder()} factory method rather than a
+ * public constructor.
+ */
 public class PIIMaskingDocumentPostProcessor implements DocumentPostProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PIIMaskingDocumentPostProcessor.class);
 
-    // Regex patterns for common PII
-
-    // Matches standard email formats: local-part@domain.tld
-    // CASE_INSENSITIVE so mixed-case domains/local-parts still match
+    /**
+     * Matches standard email formats: local-part@domain.tld.
+     * Case-insensitive so mixed-case domains/local-parts still match.
+     */
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b",
             Pattern.CASE_INSENSITIVE);
 
-    // Matches common US-style phone formats, with optional country code,
-    // optional parentheses around area code, and optional separators (-, ., space)
-    // e.g. +1 (123) 456-7890, 123.456.7890, 1234567890
+    /**
+     * Matches common US-style phone formats, with optional country code, optional
+     * parentheses around the area code, and optional separators ({@code -}, {@code .}, space).
+     * Examples: {@code +1 (123) 456-7890}, {@code 123.456.7890}, {@code 1234567890}.
+     */
     private static final Pattern PHONE_PATTERN = Pattern.compile(
             "\\b(\\+?\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b",
             Pattern.CASE_INSENSITIVE);
@@ -34,11 +44,22 @@ public class PIIMaskingDocumentPostProcessor implements DocumentPostProcessor {
     private static final String EMAIL_REPLACEMENT = "[REDACTED_EMAIL]";
     private static final String PHONE_REPLACEMENT = "[REDACTED_PHONE]";
 
-    // Private constructor forces instantiation through the static builder() factory method below,
-    // rather than `new PIIMaskingDocumentPostProcessor()` directly
+    /**
+     * Private constructor; use {@link #builder()} to obtain an instance.
+     */
     private PIIMaskingDocumentPostProcessor() {
     }
 
+    /**
+     * Masks emails and phone numbers found in the text of each document.
+     *
+     * @param query the query the documents were retrieved for (used only for logging)
+     * @param documents the retrieved documents to mask; must be non-null and contain no null elements
+     * @return a new list of documents with masked text and a {@code pii_masked} metadata flag set to
+     *         {@code true}; the input list is returned unchanged if it is empty
+     * @throws IllegalArgumentException if {@code query} or {@code documents} is null, or if
+     *         {@code documents} contains a null element
+     */
     @Override
     public List<Document> process(Query query, List<Document> documents) {
         // Defensive guards: fail fast on invalid input rather than NPE deeper in the stream
@@ -71,6 +92,14 @@ public class PIIMaskingDocumentPostProcessor implements DocumentPostProcessor {
                 .toList();
     }
 
+    /**
+     * Replaces detected email addresses and phone numbers in the given text with redaction
+     * tokens.
+     *
+     * @param text the text to mask
+     * @return the text with all detected emails and phone numbers replaced by their
+     *         respective redaction tokens
+     */
     private String maskSensitiveInformation(String text) {
         String masked = text;
         // Mask emails — replace every regex match with the redaction token
@@ -80,8 +109,11 @@ public class PIIMaskingDocumentPostProcessor implements DocumentPostProcessor {
         return masked;
     }
 
-    // Static factory method acting as the sole entry point for instantiation,
-    // since the constructor is private.
+    /**
+     * Creates a new {@link PIIMaskingDocumentPostProcessor}.
+     *
+     * @return a new instance ready to mask PII in retrieved documents
+     */
     public static PIIMaskingDocumentPostProcessor builder() {
         return new PIIMaskingDocumentPostProcessor();
     }

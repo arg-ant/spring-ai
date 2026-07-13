@@ -24,6 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
+/**
+ * REST controller exposing audio transcription (speech-to-text) and text-to-speech
+ * endpoints backed by Spring AI's {@link TranscriptionModel} and {@link TextToSpeechModel}.
+ */
 @RestController
 @RequestMapping("/api")
 public class AudioController {
@@ -33,12 +37,24 @@ public class AudioController {
     private final TranscriptionModel transcriptionModel;
     private final TextToSpeechModel textToSpeechModel;
 
+    /**
+     * Creates a new controller backed by the given audio models.
+     *
+     * @param transcriptionModel model used to transcribe audio into text
+     * @param textToSpeechModel model used to synthesize text into audio
+     */
     public AudioController(TranscriptionModel transcriptionModel,
                            TextToSpeechModel textToSpeechModel) {
         this.transcriptionModel = transcriptionModel;
         this.textToSpeechModel = textToSpeechModel;
     }
 
+    /**
+     * Transcribes the bundled sample audio file into plain text using default options.
+     *
+     * @param audioFile the audio resource to transcribe, injected from the classpath
+     * @return the transcribed text
+     */
     @GetMapping("/transcribe")
     String transcribe(@Value("classpath:SpringAI.mp3") Resource audioFile) {
 
@@ -48,7 +64,13 @@ public class AudioController {
 
     }
 
-    // returns a transcription using OpenAI-specific options (e.g. VTT subtitles)
+    /**
+     * Transcribes the bundled sample audio file using OpenAI-specific options, returning
+     * WebVTT-formatted output (subtitles with timestamps) instead of plain text.
+     *
+     * @param audioFile the audio resource to transcribe, injected from the classpath
+     * @return the transcription formatted as WebVTT
+     */
     @GetMapping("/transcribe-options")
     String transcribeWithOptions(@Value("classpath:SpringAI.mp3") Resource audioFile) {
 
@@ -72,6 +94,14 @@ public class AudioController {
         return response.getResult().getOutput();
     }
 
+    /**
+     * Synthesizes the given text into speech using default options and saves it to
+     * {@code output.mp3} in the working directory, overwriting any existing file.
+     *
+     * @param message the text to synthesize, bound from the {@code message} query parameter
+     * @return a confirmation message including the absolute path of the saved file
+     * @throws IOException if the previous output file cannot be deleted or the new one cannot be written
+     */
     @GetMapping("/speech")
     String speech(@RequestParam("message") String message) throws IOException {
         // @RequestParam binds the "message" query param (e.g. /api/speech?message=Hello) to the text to synthesize
@@ -87,6 +117,15 @@ public class AudioController {
         return "MP3 saved successfully to " + path.toAbsolutePath();
     }
 
+    /**
+     * Synthesizes the given text into speech using OpenAI-specific options (the "nova" voice,
+     * 2x speed, MP3 format) and saves it to {@code speech-options.mp3} in the working
+     * directory, overwriting any existing file.
+     *
+     * @param message the text to synthesize, bound from the {@code message} query parameter
+     * @return a confirmation message including the absolute path of the saved file
+     * @throws IOException if the previous output file cannot be deleted or the new one cannot be written
+     */
     @GetMapping("/speech-options")
     String speechWithOptions(@RequestParam("message") String message) throws IOException {
         Path path = Paths.get("speech-options.mp3");
@@ -102,6 +141,12 @@ public class AudioController {
         return "MP3 saved successfully to " + path.toAbsolutePath();
     }
 
+    /**
+     * Deletes the file at the given path if it exists, logging when a deletion occurs.
+     *
+     * @param path the path to delete
+     * @throws IOException if the file exists but cannot be deleted
+     */
     private void deleteIfPresent(Path path) throws IOException {
         if (Files.deleteIfExists(path)) {
             logger.info("Deleted existing file at {}", path.toAbsolutePath());
