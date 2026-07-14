@@ -211,7 +211,7 @@ public class MultiModelChatController {
                         .prompt()
                         .user(message)
                         .call()
-                        .entity(new ParameterizedTypeReference<List<CountryCities>>() {
+                        .entity(new ParameterizedTypeReference<>() {
                         });
 
         return ResponseEntity.ok(countryCities);

@@ -1,6 +1,8 @@
 package com.multimodel.llm.rag;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
@@ -23,6 +25,8 @@ import static com.multimodel.llm.config.Constants.MAX_NUM_CHUNKS;
  */
 //@Component
 public class HRPolicyLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(HRPolicyLoader.class);
 
     /**
      * The HR policies PDF resource, resolved from the classpath.
@@ -74,8 +78,11 @@ public class HRPolicyLoader {
                         .build();
 
         // Split documents into chunks
-        // Generate embeddings for each chunk using mxbai-embed-large
+        // Generate embeddings for each chunk using embedding agent
         // Store chunks and embeddings in Qdrant
-        vectorStore.add(textSplitter.split(documents));
+        List<Document> chunks = textSplitter.split(documents);
+        vectorStore.add(chunks);
+
+        logger.info("Loaded {} HR policy chunks into the vector store", chunks.size());
     }
 }

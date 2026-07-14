@@ -1,6 +1,8 @@
 package com.multimodel.llm.rag;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
  */
 //@Component
 public class RandomDataLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(RandomDataLoader.class);
 
     /**
      * Vector store used to persist embedded sentence documents for later retrieval.
@@ -99,5 +103,7 @@ public class RandomDataLoader {
 
         List<Document> documents = sentences.stream().map(Document::new).collect(Collectors.toList());
         vectorStore.add(documents);
+
+        logger.info("Loaded {} sentences into the vector store", documents.size());
     }
 }
