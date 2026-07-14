@@ -76,7 +76,7 @@ public class FirecrawlWebSearchDocumentRetriever implements DocumentRetriever {
                 .body(new FirecrawlRequestPayload(q, resultLimit))
                 .retrieve()
                 .body(FirecrawlResponsePayload.class);
-
+        //#TODO Check why response.data() is []
         if (response == null || CollectionUtils.isEmpty(response.data())) {
             return List.of();
         }
