@@ -95,6 +95,11 @@ class MultiModelApplicationTests {
         this.factCheckingEvaluator = FactCheckingEvaluator.builder(chatClientBuilder).build();
     }
 
+    /**
+     * Verifies that the chat controller's response to a basic geography question is
+     * both non-blank and scored as relevant by {@link #relevancyEvaluator}, above
+     * {@link #minRelevancyScore}.
+     */
     @Test
     @DisplayName("Should return relevant response for basic geography question")
 //    @Timeout(value = 100)
@@ -129,6 +134,10 @@ class MultiModelApplicationTests {
                         .isGreaterThan(minRelevancyScore));
     }
 
+    /**
+     * Verifies that the chat controller's response to a well-known factual question is
+     * both non-blank and judged factually correct by {@link #factCheckingEvaluator}.
+     */
     @Test
     @DisplayName("Should return factually correct response for gravity-related question")
     void evaluateFactAccuracyForGravityQuestion() {
@@ -153,6 +162,13 @@ class MultiModelApplicationTests {
                         .isTrue());
     }
 
+    /**
+     * Verifies that the chat controller's answer to an HR policy question is factually
+     * consistent with the HR policy document content, using {@link #hrPolicyTemplate} as
+     * the ground-truth context supplied to {@link #factCheckingEvaluator}.
+     *
+     * @throws IOException if {@link #hrPolicyTemplate} cannot be read
+     */
     @Test
     @DisplayName("Should correctly evaluate factual response based on HR policy context (RAG scenario)")
     public void evaluateHrPolicyAnswerWithRagContext() throws IOException {
