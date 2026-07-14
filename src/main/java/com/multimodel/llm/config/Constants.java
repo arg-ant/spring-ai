@@ -57,6 +57,9 @@ public class Constants {
     /** Status assigned to newly created help desk tickets. */
     public static String TICKET_STATUS_OPEN = "OPEN";
 
+    /** Status assigned to in progress help desk tickets. */
+    public static String TICKET_STATUS_IN_PROGRESS = "IN_PROGRESS";
+
     /** Maximum number of results returned by web search retrieval. */
     public static int MAX_NUM_WEB_SEARCH_RESULTS = 3;
 }
