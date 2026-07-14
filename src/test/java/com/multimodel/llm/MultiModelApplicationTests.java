@@ -24,37 +24,70 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration tests that evaluate the quality of chat responses using LLM-based
+ * evaluators ({@link RelevancyEvaluator} and {@link FactCheckingEvaluator}), covering
+ * plain chat, fact-checking, and RAG-grounded scenarios.
+ */
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(properties = {
         "logging.level.org.springframework.ai=DEBUG"})
 class MultiModelApplicationTests {
 
+    /**
+     * Mocked out since these tests don't exercise vector-store-backed retrieval.
+     */
     @MockitoBean
     private VectorStore vectorStore;
 
+    /**
+     * Mocked out since these tests don't exercise web-search-grounded chat.
+     */
     @MockitoBean
     private ChatClient webSearchChatClient;
 
+    /**
+     * Mocked out since these tests don't exercise the RAG controller's endpoints.
+     */
     @MockitoBean
     private RagController ragController;
 
+    /**
+     * Factory used to build the Bespoke-Minicheck-backed client that powers the evaluators.
+     */
     @Autowired
     private ChatClientFactory chatClientFactory;
 
+    /**
+     * Controller under test, invoked directly to obtain chat responses to evaluate.
+     */
     @Autowired
     private MultiModelChatController multiModelChatController;
 
+    /**
+     * Evaluates whether a response is relevant to the question that produced it.
+     */
     private RelevancyEvaluator relevancyEvaluator;
+
+    /**
+     * Evaluates whether a response is factually consistent with its supporting context.
+     */
     private FactCheckingEvaluator factCheckingEvaluator;
 
     // Minimum acceptable relevancy score
     @Value("${test.relevancy.min-score:0.7}")
     private float minRelevancyScore;
 
+    /**
+     * HR policy document used as ground-truth context in the RAG evaluation scenario.
+     */
     @Value("classpath:/promptTemplates/hrPolicyTemplate.st")
     Resource hrPolicyTemplate;
 
+    /**
+     * Builds the evaluators from a Bespoke-Minicheck-backed chat client before each test.
+     */
     @BeforeEach
     void setup() {
         ChatClient.Builder chatClientBuilder = chatClientFactory.createBespokeMinicheck();
