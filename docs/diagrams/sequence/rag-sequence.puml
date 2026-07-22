@@ -1,0 +1,31 @@
+@startuml 09-rag-sequence
+title RAG document chat — sequence diagram
+
+actor Client
+participant "RagController" as Controller
+participant "ChatClient\n(ragMemoryChatClient)" as ChatClient
+participant "RetrievalAugmentationAdvisor" as RagAdv
+participant "TranslationQueryTransformer" as Translator
+participant "VectorStoreDocumentRetriever" as Retriever
+participant "Qdrant" as Qdrant
+participant "PIIMaskingDocumentPostProcessor" as PII
+participant "Ollama model" as Model
+
+Client -> Controller: GET /rag/document/chat?message=...\n(username header)
+Controller -> ChatClient: prompt().advisors(CONVERSATION_ID).user(message).call()
+ChatClient -> RagAdv: augment request
+RagAdv -> Translator: translate(query)
+Translator --> RagAdv: english query
+RagAdv -> Retriever: retrieve(query)
+Retriever -> Qdrant: similaritySearch(topK=3, threshold=0.5)
+Qdrant --> Retriever: matching documents
+Retriever --> RagAdv: documents
+RagAdv -> PII: process(documents)
+PII --> RagAdv: masked documents
+RagAdv --> ChatClient: prompt + context
+ChatClient -> Model: generate(prompt)
+Model --> ChatClient: answer
+ChatClient --> Controller: answer
+Controller --> Client: 200 OK
+
+@enduml

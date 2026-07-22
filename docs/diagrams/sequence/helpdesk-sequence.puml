@@ -1,0 +1,24 @@
+@startuml 08-helpdesk-sequence
+title Help-desk tool calling — sequence diagram
+
+actor Client
+participant "HelpDeskController" as Controller
+participant "ChatClient\n(helpDeskChatClient)" as ChatClient
+participant "HelpDeskTools" as Tools
+participant "HelpDeskTicketService" as Service
+participant "HelpDeskTicketRepository" as Repo
+
+Client -> Controller: GET /tools/help-desk?message=...\n(username header)
+Controller -> ChatClient: prompt().tools(helpDeskTools)\n.toolContext(username).call()
+ChatClient -> ChatClient: model decides to call a tool
+ChatClient -> Tools: createTicket(ticketRequest, toolContext)
+Tools -> Service: createTicket(ticketInput, username)
+Service -> Repo: save(ticket)
+Repo --> Service: ticket (with id)
+Service --> Tools: ticket
+Tools --> ChatClient: "Ticket #5 created for user ..."
+note right of ChatClient: returnDirect = true\nbypasses further model processing
+ChatClient --> Controller: answer
+Controller --> Client: 200 OK
+
+@enduml

@@ -1,0 +1,26 @@
+@startuml 11-self-evaluation-sequence
+title Self-evaluation / fact-checking — sequence diagram
+
+actor Client
+participant "SelfEvaluatingChatController" as Controller
+participant "ChatClient\n(ollamaChatClient)" as ChatClient
+participant "FactCheckingEvaluator" as Evaluator
+participant "ChatClient\n(bespokeMinicheckChatClient)" as BespokeClient
+participant "GlobalExceptionHandler" as ExHandler
+
+Client -> Controller: GET /evaluate/chat?message=...
+Controller -> ChatClient: prompt(message).call()
+ChatClient --> Controller: aiResponse
+Controller -> Evaluator: evaluate(question, context, aiResponse)
+Evaluator -> BespokeClient: prompt(fact-check prompt).call()
+BespokeClient --> Evaluator: verdict
+Evaluator --> Controller: EvaluationResponse
+
+alt evaluation passes
+  Controller --> Client: 200 OK (answer)
+else evaluation fails
+  Controller -> ExHandler: throw InvalidAnswerException
+  ExHandler --> Client: 400 Bad Request
+end
+
+@enduml

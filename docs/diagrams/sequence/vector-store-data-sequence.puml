@@ -1,0 +1,52 @@
+@startuml vector-store-data-sequence
+title Vector store data loading — sequence diagram
+
+actor Client
+participant "VectorStoreDataController" as Controller
+participant "VectorStoreDataService" as Service
+participant "TikaDocumentReader" as Tika
+participant "TokenTextSplitter" as Splitter
+participant "VectorStore" as Store
+
+== Load random sentences ==
+Client -> Controller: POST /api/rag/random/load
+Controller -> Service: loadRandom()
+Service -> Service: getSentences()
+Service -> Service: wrap each sentence in a\nDocument tagged source=random-data
+Service -> Store: add(documents)
+Store --> Service: void
+Service --> Controller: void
+Controller --> Client: "Random data loaded"
+
+== Remove random sentences ==
+Client -> Controller: DELETE /api/rag/random/remove
+Controller -> Service: removeRandom()
+Service -> Service: build filter\nsource == random-data
+Service -> Store: delete(filterExpression)
+Store --> Service: void
+Service --> Controller: void
+Controller --> Client: "Random data removed"
+
+== Load HR policy PDF ==
+Client -> Controller: POST /api/rag/document/load
+Controller -> Service: loadPDF()
+Service -> Tika: read()
+Tika --> Service: documents
+Service -> Splitter: split(documents)
+Splitter --> Service: chunks
+Service -> Service: tag each chunk\nsource=hr-policy-pdf
+Service -> Store: add(chunks)
+Store --> Service: void
+Service --> Controller: void
+Controller --> Client: "Document data loaded"
+
+== Remove HR policy PDF ==
+Client -> Controller: DELETE /api/rag/document/remove
+Controller -> Service: removePDF()
+Service -> Service: build filter\nsource == hr-policy-pdf
+Service -> Store: delete(filterExpression)
+Store --> Service: void
+Service --> Controller: void
+Controller --> Client: "Document data removed"
+
+@enduml

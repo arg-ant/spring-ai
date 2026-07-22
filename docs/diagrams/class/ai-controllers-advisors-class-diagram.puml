@@ -1,0 +1,110 @@
+@startuml ai-controllers-advisors-class-diagram
+title Chat controllers &amp; advisors — class diagram
+
+class ImageController {
+  -imageModel: ImageModel
+  +generateImage(message: String): String
+  +generateImageWithOptions(message: String): String
+}
+
+class MemoryChatController {
+  -chatClient: ChatClient
+  +chatMemory(conversationId: String, message: String): ResponseEntity<String>
+}
+
+class MultiModelChatController {
+  -userPromptTemplate: Resource
+  -hrPolicyTemplate: Resource
+  -systemPromptTemplate: Resource
+  -openAiChatClient: ChatClient
+  -ollamaChatClient: ChatClient
+  +openAiChat(message: String): String
+  +chat(message: String): String
+  +email(customerName: String, customerMessage: String): String
+  +promptStuff(message: String): String
+  +stream(message: String): Flux<String>
+  +chatBean(message: String): ResponseEntity<CountryCities>
+  +chatList(message: String): ResponseEntity<List<String>>
+  +chatMap(message: String): ResponseEntity<Map<String, Object>>
+  +chatBeanList(message: String): ResponseEntity<List<CountryCities>>
+}
+
+class OllamaChatController {
+  -ollamaChatClient: ChatClient
+  +ollamaChat(message: String): String
+}
+
+class TimeController {
+  -chatClient: ChatClient
+  +localTime(conversationId: String, message: String): ResponseEntity<String>
+}
+
+class TokenLoggerAdvisor {
+  +adviseCall(request: ChatClientRequest, chain: CallAdvisorChain): ChatClientResponse
+  +getName(): String
+  +getOrder(): int
+}
+
+interface CallAdvisor {
+  +adviseCall(request: ChatClientRequest, chain: CallAdvisorChain): ChatClientResponse
+  +getName(): String
+  +getOrder(): int
+}
+
+class RagAdvisor <<Configuration>> {
+  +retrievalAugmentationAdvisor(vectorStore: VectorStore, chatClientFactory: ChatClientFactory): RetrievalAugmentationAdvisor
+}
+
+class ChatClientFactory {
+  +createOllama(advisors: Advisor...): ChatClient.Builder
+  +createOpenAi(advisors: Advisor...): ChatClient.Builder
+  +createBespokeMinicheck(): ChatClient.Builder
+  +create(chatModel: ChatModel, advisors: Advisor...): ChatClient.Builder
+}
+
+interface ChatClient {
+  +prompt(): ChatClientRequestSpec
+}
+
+class TimeTools {
+  +getCurrentLocalTime(): String
+  +getCurrentTime(timeZone: String): String
+}
+
+interface ImageModel {
+  +call(prompt: ImagePrompt): ImageResponse
+}
+
+class RetrievalAugmentationAdvisor {
+  +adviseCall(request: ChatClientRequest, chain: CallAdvisorChain): ChatClientResponse
+}
+
+TokenLoggerAdvisor ..|> CallAdvisor
+
+ImageController --> ImageModel : uses
+MemoryChatController --> ChatClient : uses (memoryChatClient)
+MultiModelChatController --> ChatClient : uses (openAiChatClient, ollamaChatClient)
+OllamaChatController --> ChatClient : uses (ollamaChatClient)
+TimeController --> ChatClient : uses (timeChatClient)
+TimeController ..> TimeTools : answers via tool calls\n(wired into timeChatClient)
+
+ChatClientFactory --> ChatClient : builds every client via ChatClient.Builder
+ChatClientFactory ..> TokenLoggerAdvisor : registers as a default advisor\non every client it builds
+RagAdvisor ..> RetrievalAugmentationAdvisor : builds bean
+RagAdvisor --> ChatClientFactory : uses (query-translation chat client)
+RetrievalAugmentationAdvisor ..|> CallAdvisor
+
+note right of RagAdvisor
+  RetrievalAugmentationAdvisor is only wired
+  into ragMemoryChatClient (used by RagController),
+  not into the chat clients used by the five
+  controllers on the left.
+end note
+
+note right of TokenLoggerAdvisor
+  Added by ChatClientFactory.create() to
+  every ChatClient it builds, so it wraps
+  calls from all five controllers.
+end note
+
+@enduml

@@ -1,0 +1,89 @@
+@startuml ai-controllers-advisors-sequence
+title Chat controllers &amp; advisors — sequence diagram
+
+actor Client
+participant "ImageController" as ImageCtrl
+participant "MemoryChatController" as MemCtrl
+participant "MultiModelChatController" as MultiCtrl
+participant "OllamaChatController" as OllamaCtrl
+participant "TimeController" as TimeCtrl
+participant "ChatClient" as ChatClient
+participant "TokenLoggerAdvisor" as TokenLogger
+participant "TimeTools" as Tools
+participant "ImageModel" as ImageModel
+participant "Model\n(Ollama / OpenAI)" as Model
+
+== Image generation ==
+Client -> ImageCtrl: GET /api/image?message=...
+ImageCtrl -> ImageModel: call(new ImagePrompt(message))
+ImageModel --> ImageCtrl: imageResponse
+ImageCtrl --> Client: base64 image JSON
+
+== Memory-scoped chat ==
+Client -> MemCtrl: GET /api/chat-memory?message=...\n(username header)
+MemCtrl -> ChatClient: prompt().advisors(CONVERSATION_ID)\n.user(message).call()
+ChatClient -> TokenLogger: adviseCall(request, chain)
+TokenLogger -> Model: nextCall(request)\n(memory advisor injects prior turns first)
+Model --> TokenLogger: response + usage
+TokenLogger -> TokenLogger: log token usage
+TokenLogger --> ChatClient: response
+ChatClient --> MemCtrl: content()
+MemCtrl --> Client: 200 OK
+
+== Multi-model chat (e.g. /api/openai/chat) ==
+Client -> MultiCtrl: GET /api/openai/chat?message=...
+MultiCtrl -> ChatClient: prompt(message).call()
+ChatClient -> TokenLogger: adviseCall(request, chain)
+TokenLogger -> Model: nextCall(request)
+Model --> TokenLogger: response + usage
+TokenLogger -> TokenLogger: log token usage
+TokenLogger --> ChatClient: response
+ChatClient --> MultiCtrl: content()
+MultiCtrl --> Client: response text
+note right of MultiCtrl
+  Same shape for /ollama/chat, /email,
+  /prompt-stuffing, /stream, and the
+  structured-output endpoints
+  (chat-bean, chat-list, chat-map, chat-bean-list).
+end note
+
+== Plain Ollama chat with inline system prompt ==
+Client -> OllamaCtrl: GET /api/chat?message=...
+OllamaCtrl -> ChatClient: prompt().system("IT helpdesk assistant...")\n.user(message).call()
+ChatClient -> TokenLogger: adviseCall(request, chain)
+TokenLogger -> Model: nextCall(request)
+Model --> TokenLogger: response + usage
+TokenLogger -> TokenLogger: log token usage
+TokenLogger --> ChatClient: response
+ChatClient --> OllamaCtrl: content()
+OllamaCtrl --> Client: response text
+
+== Time-tool chat ==
+Client -> TimeCtrl: GET /api/tools/local-time?message=...\n(username header)
+TimeCtrl -> ChatClient: prompt().advisors(CONVERSATION_ID)\n.user(message).call()
+ChatClient -> TokenLogger: adviseCall(request, chain)
+TokenLogger -> Model: nextCall(request)\n(defaultTools = TimeTools)
+Model -> Tools: getCurrentLocalTime() / getCurrentTime(timeZone)\n(model decides to call a tool)
+Tools --> Model: current time string
+Model --> TokenLogger: final answer + usage
+TokenLogger -> TokenLogger: log token usage
+TokenLogger --> ChatClient: response
+ChatClient --> TimeCtrl: content()
+TimeCtrl --> Client: 200 OK
+
+== Application startup — RagAdvisor bean assembly (not per-request) ==
+participant "ChatClientConfig" as Config
+participant "RagAdvisor" as RagAdv
+participant "ChatClientFactory" as Factory
+Config -> RagAdv: retrievalAugmentationAdvisor(vectorStore, chatClientFactory)
+RagAdv -> Factory: createOllama()\n(for the query-translation chat client)
+Factory --> RagAdv: ChatClient.Builder
+RagAdv --> Config: RetrievalAugmentationAdvisor bean
+note right of RagAdv
+  Runs once at startup, not on the request
+  path of any of the five controllers above.
+  The resulting bean is only injected into
+  ragMemoryChatClient (used by RagController).
+end note
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml 10-chat-memory-sequence
+title Chat memory — sequence diagram
+
+actor Client
+participant "MemoryChatController" as Controller
+participant "ChatClient\n(memoryChatClient)" as ChatClient
+participant "MessageChatMemoryAdvisor" as MemAdv
+participant "JdbcChatMemoryRepository" as Repo
+database "H2 (SPRING_AI_CHAT_MEMORY)" as H2
+participant "Ollama model" as Model
+
+Client -> Controller: GET /chat-memory?message=...\n(username header)
+Controller -> ChatClient: prompt().advisors(CONVERSATION_ID).user(message).call()
+ChatClient -> MemAdv: load history(conversationId)
+MemAdv -> Repo: findByConversationId(conversationId)
+Repo -> H2: SELECT ... WHERE conversation_id=?
+H2 --> Repo: rows
+Repo --> MemAdv: last 10 messages
+MemAdv --> ChatClient: history + new user message
+ChatClient -> Model: generate(prompt)
+Model --> ChatClient: answer
+ChatClient -> Repo: save(user message, assistant message)
+Repo -> H2: INSERT
+ChatClient --> Controller: answer
+Controller --> Client: 200 OK
+
+@enduml

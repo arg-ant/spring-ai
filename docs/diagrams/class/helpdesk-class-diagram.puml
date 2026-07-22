@@ -1,0 +1,42 @@
+@startuml 06-helpdesk-class-diagram
+title Help-desk subsystem — class diagram
+
+class HelpDeskController {
+  +helpDesk(username: String, message: String): ResponseEntity<String>
+}
+
+class HelpDeskTools {
+  +createTicket(ticketRequest: TicketRequest, toolContext: ToolContext): String
+  +getTicketStatus(toolContext: ToolContext): List<HelpDeskTicket>
+}
+
+class HelpDeskTicketService {
+  +createTicket(ticketInput: TicketRequest, username: String): HelpDeskTicket
+  +getTicketsByUsername(username: String): List<HelpDeskTicket>
+}
+
+interface HelpDeskTicketRepository {
+  +findByUsername(username: String): List<HelpDeskTicket>
+}
+
+class HelpDeskTicket {
+  -id: Long
+  -username: String
+  -issue: String
+  -status: String
+  -createdAt: LocalDateTime
+  -eta: LocalDateTime
+}
+
+class TicketRequest <<record>> {
+  +issue: String
+}
+
+HelpDeskController --> HelpDeskTools : invokes as tool
+HelpDeskTools --> HelpDeskTicketService : delegates to
+HelpDeskTicketService --> HelpDeskTicketRepository : uses
+HelpDeskTicketRepository ..> HelpDeskTicket : manages
+HelpDeskTools ..> TicketRequest : receives
+HelpDeskTicketService ..> TicketRequest : receives
+
+@enduml

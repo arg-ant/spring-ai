@@ -1,0 +1,56 @@
+@startuml 07-chatclient-class-diagram
+title ChatClient / advisor architecture — class diagram
+
+class ChatClientFactory {
+  +createOllama(advisors: Advisor...): ChatClient.Builder
+  +createOpenAi(advisors: Advisor...): ChatClient.Builder
+  +createBespokeMinicheck(): ChatClient.Builder
+  +create(chatModel: ChatModel, advisors: Advisor...): ChatClient.Builder
+}
+
+class ChatClientConfig {
+  +openAiChatClient(): ChatClient
+  +ollamaChatClient(): ChatClient
+  +bespokeMinicheckChatClient(): ChatClient
+  +messageWindowChatMemory(): ChatMemory
+  +memoryChatClient(): ChatClient
+  +ragMemoryChatClient(): ChatClient
+  +timeChatClient(): ChatClient
+  +helpDeskChatClient(): ChatClient
+  +webSearchChatClient(): ChatClient
+}
+
+class MemoryAdvisor {
+  +{static} memoryAdvisor(chatMemory: ChatMemory): Advisor
+}
+
+class RagAdvisor {
+  +retrievalAugmentationAdvisor(vectorStore: VectorStore, chatClientFactory: ChatClientFactory): RetrievalAugmentationAdvisor
+}
+
+class WebSearchAdvisor {
+  +{static} webSearchAdvisor(restClientBuilder: RestClient.Builder): Advisor
+}
+
+class TokenLoggerAdvisor {
+  +adviseCall(request: ChatClientRequest, chain: CallAdvisorChain): ChatClientResponse
+  +getName(): String
+  +getOrder(): int
+}
+
+class Constants {
+  +{static} TEMPERATURE: double
+  +{static} MAX_TOKENS: int
+  +{static} MAX_MESSAGES: int
+  +{static} TOP_K: int
+  +{static} SIMILARITY_THRESHOLD: double
+}
+
+ChatClientConfig --> ChatClientFactory : uses
+ChatClientConfig --> MemoryAdvisor : uses
+ChatClientConfig --> RagAdvisor : uses
+ChatClientConfig --> WebSearchAdvisor : uses
+ChatClientFactory --> TokenLoggerAdvisor : registers by default
+ChatClientFactory ..> Constants : reads defaults
+
+@enduml

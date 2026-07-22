@@ -32,7 +32,7 @@ RAG), conversation memory, tool calling, image/audio processing, and full observ
 
 Edit MultiModelApplication configuration by adding the following environment variables:
 - `OPENAI_API_KEY`
-- `FIRECRAWL_API_KEY`
+- `FIRECRAWL_API_KEY` / `TAVILY_API_KEY`
 
 Run MultiModelApplication.java in debug mode and it will automatically start all infrastructure services.
 
@@ -125,15 +125,40 @@ every 5 seconds.
 
 ### Flow Diagrams
 
-Detailed Mermaid diagrams for the main request flows live in [`docs/flows`](docs/flows):
+Detailed diagrams for the main request flows live in [`docs/diagrams`](docs/diagrams), split by
+kind. Each diagram has a Mermaid version (renders natively on GitHub) and an equivalent PlantUML
+version (open in JetBrains IDEs with the PlantUML Integration plugin) side by side in the same
+folder.
 
-| Flow | Doc |
-|---|---|
-| Overall architecture (controller → ChatClient → advisors → model → infra) | [`01-overall-architecture.md`](docs/flows/01-overall-architecture.md) |
-| RAG pipeline (query translation → vector search → PII masking → prompt injection) | [`02-rag-pipeline.md`](docs/flows/02-rag-pipeline.md) |
-| Chat memory (per-user history load/save via H2) | [`03-chat-memory.md`](docs/flows/03-chat-memory.md) |
-| Help-desk tool calling (model-invoked `@Tool` methods) | [`04-helpdesk-tool-calling.md`](docs/flows/04-helpdesk-tool-calling.md) |
-| Self-evaluation / fact-checking | [`05-self-evaluation.md`](docs/flows/05-self-evaluation.md) |
+#### Flow diagrams — [`docs/diagrams/flow`](docs/diagrams/flow)
+
+| Flow | Doc | PlantUML |
+|---|---|---|
+| Overall architecture (controller → ChatClient → advisors → model → infra) | [`overall-architecture.md`](docs/diagrams/flow/overall-architecture.md) | [`overall-architecture.puml`](docs/diagrams/flow/overall-architecture.puml) |
+| RAG pipeline (query translation → vector search → PII masking → prompt injection) | [`rag-pipeline.md`](docs/diagrams/flow/rag-pipeline.md) | [`rag-pipeline.puml`](docs/diagrams/flow/rag-pipeline.puml) |
+| Chat memory (per-user history load/save via H2) | [`chat-memory.md`](docs/diagrams/flow/chat-memory.md) | [`chat-memory.puml`](docs/diagrams/flow/chat-memory.puml) |
+| Help-desk tool calling (model-invoked `@Tool` methods) | [`helpdesk-tool-calling.md`](docs/diagrams/flow/helpdesk-tool-calling.md) | [`helpdesk-tool-calling.puml`](docs/diagrams/flow/helpdesk-tool-calling.puml) |
+| Self-evaluation / fact-checking | [`self-evaluation.md`](docs/diagrams/flow/self-evaluation.md) | [`self-evaluation.puml`](docs/diagrams/flow/self-evaluation.puml) |
+
+#### Class diagrams — [`docs/diagrams/class`](docs/diagrams/class)
+
+| Subsystem | Doc | PlantUML |
+|---|---|---|
+| `ChatClient` / advisor architecture (`ChatClientConfig`, `ChatClientFactory`, advisor beans) | [`chatclient-class-diagram.md`](docs/diagrams/class/chatclient-class-diagram.md) | [`chatclient-class-diagram.puml`](docs/diagrams/class/chatclient-class-diagram.puml) |
+| Chat controllers & advisors (`ImageController`, `MemoryChatController`, `MultiModelChatController`, `OllamaChatController`, `TimeController`, `RagAdvisor`, `TokenLoggerAdvisor`) | [`ai-controllers-advisors-class-diagram.md`](docs/diagrams/class/ai-controllers-advisors-class-diagram.md) | [`ai-controllers-advisors-class-diagram.puml`](docs/diagrams/class/ai-controllers-advisors-class-diagram.puml) |
+| Help-desk subsystem (ticket creation and lookup) | [`helpdesk-class-diagram.md`](docs/diagrams/class/helpdesk-class-diagram.md) | [`helpdesk-class-diagram.puml`](docs/diagrams/class/helpdesk-class-diagram.puml) |
+| Vector store data loading | [`vector-store-data-class-diagram.md`](docs/diagrams/class/vector-store-data-class-diagram.md) | [`vector-store-data-class-diagram.puml`](docs/diagrams/class/vector-store-data-class-diagram.puml) |
+
+#### Sequence diagrams — [`docs/diagrams/sequence`](docs/diagrams/sequence)
+
+| Flow | Doc | PlantUML |
+|---|---|---|
+| Chat controllers & advisors (five representative endpoints, `TokenLoggerAdvisor` wrapping, `RagAdvisor` bean assembly) | [`ai-controllers-advisors-sequence.md`](docs/diagrams/sequence/ai-controllers-advisors-sequence.md) | [`ai-controllers-advisors-sequence.puml`](docs/diagrams/sequence/ai-controllers-advisors-sequence.puml) |
+| RAG document chat | [`rag-sequence.md`](docs/diagrams/sequence/rag-sequence.md) | [`rag-sequence.puml`](docs/diagrams/sequence/rag-sequence.puml) |
+| Chat memory | [`chat-memory-sequence.md`](docs/diagrams/sequence/chat-memory-sequence.md) | [`chat-memory-sequence.puml`](docs/diagrams/sequence/chat-memory-sequence.puml) |
+| Help-desk tool calling | [`helpdesk-sequence.md`](docs/diagrams/sequence/helpdesk-sequence.md) | [`helpdesk-sequence.puml`](docs/diagrams/sequence/helpdesk-sequence.puml) |
+| Self-evaluation / fact-checking | [`self-evaluation-sequence.md`](docs/diagrams/sequence/self-evaluation-sequence.md) | [`self-evaluation-sequence.puml`](docs/diagrams/sequence/self-evaluation-sequence.puml) |
+| Vector store data loading | [`vector-store-data-sequence.md`](docs/diagrams/sequence/vector-store-data-sequence.md) | [`vector-store-data-sequence.puml`](docs/diagrams/sequence/vector-store-data-sequence.puml) |
 
 ### ChatClientFactory
 

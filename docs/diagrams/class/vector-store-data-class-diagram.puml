@@ -1,0 +1,55 @@
+@startuml vector-store-data-class-diagram
+title Vector store data loading — class diagram
+
+class VectorStoreDataController {
+  -randomDataService: VectorStoreDataService
+  +loadRandom(): String
+  +removeRandom(): String
+  +loadPDF(): String
+  +removePDF(): String
+}
+
+class VectorStoreDataService {
+  -{static} RANDOM_DATA: String
+  -{static} PDF_DATA: String
+  -policyFile: Resource
+  -vectorStore: VectorStore
+  +loadRandom(): void
+  +removeRandom(): void
+  +loadPDF(): void
+  +removePDF(): void
+  -getSentences(): List<String>
+}
+
+interface VectorStore {
+  +add(documents: List<Document>): void
+  +delete(filterExpression: Filter.Expression): void
+}
+
+class Document {
+  -metadata: Map<String, Object>
+}
+
+class TikaDocumentReader {
+  +read(): List<Document>
+}
+
+class TokenTextSplitter {
+  +split(documents: List<Document>): List<Document>
+}
+
+class FilterExpressionBuilder {
+  +eq(key: String, value: Object): FilterExpressionBuilder
+  +build(): Filter.Expression
+}
+
+VectorStoreDataController --> VectorStoreDataService : delegates to
+VectorStoreDataService --> VectorStore : uses
+VectorStoreDataService ..> TikaDocumentReader : creates (loadPDF)
+VectorStoreDataService ..> TokenTextSplitter : creates (loadPDF)
+VectorStoreDataService ..> FilterExpressionBuilder : creates (removeRandom, removePDF)
+VectorStoreDataService ..> Document : creates/tags
+TikaDocumentReader ..> Document : produces
+TokenTextSplitter ..> Document : produces chunks
+
+@enduml
