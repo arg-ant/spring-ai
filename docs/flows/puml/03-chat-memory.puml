@@ -1,0 +1,19 @@
+@startuml 03-chat-memory
+title Chat memory flow
+
+start
+:Request arrives;
+note right: username header, message param
+:Load history;
+note right: Last 10 messages from H2
+:Build prompt;
+note right: History + new user message
+:Call model;
+note right: Ollama chat model
+:Save turn;
+note right: Persisted to SPRING_AI_CHAT_MEMORY
+:Response returned;
+note right: To controller as 200 OK
+stop
+
+@enduml

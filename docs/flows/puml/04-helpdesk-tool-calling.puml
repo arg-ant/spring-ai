@@ -1,0 +1,17 @@
+@startuml 04-helpdesk-tool-calling
+title Help-desk tool calling flow
+
+start
+:User message;
+note right: username in tool context
+:Model decides;
+note right: Create ticket or check status
+:HelpDeskTools invoked;
+note right: createTicket or getTicketStatus
+:Ticket repository;
+note right: H2 helpdesk_tickets table
+:Result returned;
+note right: Ticket create bypasses re-processing
+stop
+
+@enduml

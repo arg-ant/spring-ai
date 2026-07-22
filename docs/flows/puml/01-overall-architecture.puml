@@ -1,0 +1,29 @@
+@startuml 01-overall-architecture
+title Overall architecture flow
+
+start
+:REST controller;
+note right: e.g. HelpDeskController
+:ChatClient;
+note right: Built by ChatClientFactory
+:Advisor chain;
+note right: Logger, memory, RAG, web search
+:Model provider;
+note right: Ollama or OpenAI
+
+fork
+  :H2;
+  note right: Chat memory
+fork again
+  :Qdrant;
+  note right: Vector store
+fork again
+  :Tavily;
+  note right: Web search
+end fork
+
+:Response;
+note right: Logged, returned to controller
+stop
+
+@enduml

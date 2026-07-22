@@ -1,0 +1,24 @@
+@startuml 05-self-evaluation
+title Self-evaluation / fact-checking flow
+
+start
+:User question;
+note right: Plain or HR-policy stuffed
+:Generate answer;
+note right: Ollama chat client
+:Fact-check answer;
+note right: bespoke-minicheck model
+
+if (passes evaluation?) then (yes)
+  :Return answer;
+  note right: 200 OK
+else (no)
+  :Throw exception;
+  note right: InvalidAnswerException
+  :GlobalExceptionHandler;
+  note right: 400 Bad Request
+endif
+
+stop
+
+@enduml

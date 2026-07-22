@@ -1,0 +1,19 @@
+@startuml 02-rag-pipeline
+title RAG pipeline flow
+
+start
+:User query;
+note right: Via chat endpoint
+:Translate query;
+note right: Normalize to english
+:Vector search;
+note right: Top-3, similarity >= 0.5
+:Mask PII;
+note right: Redact emails, phone numbers
+:Inject context;
+note right: Documents into system prompt
+:Generate answer;
+note right: Ollama LLM response
+stop
+
+@enduml
