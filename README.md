@@ -82,6 +82,15 @@ every 5 seconds.
 | GET    | `/api/rag/document/chat?message=`   | `username` | HR document context + memory      |
 | GET    | `/api/rag/web-search/chat?message=` | `username` | Live web search + memory          |
 
+### Vector Store Data — `/api/rag`
+
+| Method | Path                     | Description                                          |
+|--------|--------------------------|-------------------------------------------------------|
+| POST   | `/api/rag/random/load`   | Load sample sentences into the vector store           |
+| DELETE | `/api/rag/random/remove` | Remove the loaded sample sentences from the vector store |
+| POST   | `/api/rag/document/load` | Load the HR policies PDF into the vector store         |
+| DELETE | `/api/rag/document/remove` | Remove the loaded HR policies PDF from the vector store |
+
 ### Tool Calling — `/api/tools`
 
 | Method | Path                             | Headers    | Description                         |
@@ -192,10 +201,10 @@ Key constants (`Constants.java`):
 |-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `application.properties`                            | Spring Boot configuration: datasource, AI provider settings, actuator/metrics, and tracing                                                                                                            |
 | `schema/schema-h2db.sql`                            | DDL for the `SPRING_AI_CHAT_MEMORY` table backing JDBC-based conversation memory                                                                                                                      |
-| `HR_Policies.pdf`                                   | Sample HR policy document, loaded into the vector store by `HRPolicyLoader` for RAG demos                                                                                                             |
+| `HR_Policies.pdf`                                   | Sample HR policy document, loaded into the vector store by `VectorStoreDataService#loadPDF()` for RAG demos                                                                                           |
 | `SpringAI.mp3`                                      | Sample audio clip used by `AudioController`'s transcription endpoints                                                                                                                                 |
 | `promptTemplates/systemPromptTemplate.st`           | System prompt (with `{documents}` placeholder) used for HR-policy RAG chat in `RagController#randomChat`                                                                                              |
-| `promptTemplates/systemPromptRandomDataTemplate.st` | System prompt template (with `{documents}` placeholder) intended for RAG over the `RandomDataLoader` sentence dataset; currently unreferenced in code                                                 |
+| `promptTemplates/systemPromptRandomDataTemplate.st` | System prompt template (with `{documents}` placeholder) intended for RAG over the `VectorStoreDataService#loadRandom()` sentence dataset; currently unreferenced in code                              |
 | `promptTemplates/hrPolicyTemplate.st`               | HR policy summary (leave, working hours, benefits, etc.) used as the system prompt for prompt-stuffing demos in `MultiModelChatController#promptStuff` and `SelfEvaluatingChatController#promptStuff` |
 | `promptTemplates/helpDeskSystemPromptTemplate.st`   | System prompt defining the virtual help-desk assistant persona and ticket-handling rules, used by the `helpDeskChatClient` bean                                                                       |
 | `promptTemplates/userPromptTemplate.st`             | Template (with `{customerName}`/`{customerMessage}` placeholders) for generating customer support emails in `MultiModelChatController#email`                                                          |

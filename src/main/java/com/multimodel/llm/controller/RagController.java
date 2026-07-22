@@ -37,7 +37,6 @@ public class RagController {
     private final ChatClient webSearchChatClient;
     private final VectorStore vectorStore;
 
-
     /**
      * Creates a new controller backed by the given chat clients and vector store.
      *
@@ -60,8 +59,8 @@ public class RagController {
      * calling the model. Conversation memory is scoped to the given username.
      * <p>
      * Requires the vector store to have been populated with sample data beforehand. See
-     * {@link com.multimodel.llm.rag.RandomDataLoader}, whose {@code @Component} annotation
-     * must be uncommented so it loads its sentences into the vector store on startup.
+     * {@link com.multimodel.llm.service.VectorStoreDataService#loadRandom()}, which can be
+     * triggered via {@code POST /api/rag/random/load}.
      *
      * @param username the conversation identifier, bound from the {@code username} request header
      * @param message the user's question, bound from the {@code message} query parameter
@@ -86,7 +85,6 @@ public class RagController {
                 .collect(Collectors.joining(System.lineSeparator())); // Merge all document texts into a single context string
 
         String answer = ragChatMemoryClient.prompt()
-
                 .system(promptSystemSpec -> promptSystemSpec
                         .text(systemPromptTemplate)               // Load the system prompt template
                         .param(DOCUMENTS_PLACEHOLDER, similarContext)) // Replace {documents} placeholder with retrieved context
@@ -95,14 +93,11 @@ public class RagController {
                 // Use username as conversation ID so previous messages can be remembered
 
                 .user(message)                             // Add the user's question to the prompt
-
                 .call()                                    // Send prompt to the LLM
                 .content();                                // Extract generated response text
 
         return ResponseEntity.ok(answer);                  // Return answer as HTTP 200 response
     }
-
-
 
     /**
      * Answers the given message using the RAG-augmented chat client, which retrieves relevant
@@ -110,8 +105,8 @@ public class RagController {
      * scoped to the given username.
      * <p>
      * Requires the vector store to have been populated with the HR policies document
-     * beforehand. See {@link com.multimodel.llm.rag.HRPolicyLoader}, whose {@code @Component}
-     * annotation must be uncommented so it loads the document into the vector store on startup.
+     * beforehand. See {@link com.multimodel.llm.service.VectorStoreDataService#loadPDF()},
+     * which can be triggered via {@code POST /api/rag/document/load}.
      *
      * @param username the conversation identifier, bound from the {@code username} request header
      * @param message the user's question, bound from the {@code message} query parameter

@@ -1,0 +1,1135 @@
+{
+  "info": {
+    "_postman_id": "298adaf7-66d7-46b8-846f-d19d994d0faa",
+    "name": "SpringAI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21519272"
+  },
+  "item": [
+    {
+      "name": "Section01",
+      "item": [
+        {
+          "name": "chat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat?message=What is your name and which model you are using ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is your name and which model you are using ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Joke",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat?message=Tell me a joke about Spring Boot ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Tell me a joke about Spring Boot ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MultiModelOpenAIChat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/openai/chat?message=What is your name and which model you are using ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "openai",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is your name and which model you are using ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MultiModelOllamaChat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/ollama/chat?message=What is your name and which model you are using ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "ollama",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is your name and which model you are using ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section02",
+      "item": [
+        {
+          "name": "UserPromptTemplate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/email?customerName=Diana&customerMessage=I am not able to access my account, it says account locked. please help",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "email"
+              ],
+              "query": [
+                {
+                  "key": "customerName",
+                  "value": "Diana"
+                },
+                {
+                  "key": "customerMessage",
+                  "value": "I am not able to access my account, it says account locked. please help"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PromptStuffing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/prompt-stuffing?message=I used 5 leaves in this year. How many remained for current year?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "prompt-stuffing"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "I used 5 leaves in this year. How many remained for current year?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ChatBean",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-bean?message=Provide me the cities details in Romania ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-bean"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Provide me the cities details in Romania ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ChatList",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-list?message=Provide me the cities details in Romania ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-list"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Provide me the cities details in Romania ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ChatMap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-map?message=Provide me the details of 2 cities in Romania ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-map"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Provide me the details of 2 cities in Romania ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ChatBeanList",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-bean-list?message=Provide me the details of 2 countries and 2 of their cities in Europe ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-bean-list"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Provide me the details of 2 countries and 2 of their cities in Europe ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section04",
+      "item": [
+        {
+          "name": "ChatMemory question",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-memory?message=What is my name?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-memory"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is my name?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ChatMemory response",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/chat-memory?message=My name is Andrei",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat-memory"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "My name is Andrei"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section05",
+      "item": [
+        {
+          "name": "VECTOR-STORE Random data load",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/random/load",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "random",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "VECTOR-STORE Random data remove",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/random/remove",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "random",
+                "remove"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-RANDOM no context",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/random/chat?message=What happens if I swim daily ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "random",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What happens if I swim daily ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-RANDOM context",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/random/chat?message=What is STEM ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "random",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is STEM ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "VECTOR-STORE Document data load",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/document/load",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "document",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "VECTOR-STORE Document data remove",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag02",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/document/remove",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "document",
+                "remove"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-DOCUMENT",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/document/chat?message=Tell me about the paternity leave ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "document",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Tell me about the paternity leave ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-DOCUMENT placeholder",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/document/chat?message=Tell me about the notice period",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "document",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Tell me about the notice period"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-DOCUMENT romanian",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/document/chat?message=Care este perioada de concediu maternal ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "document",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Care este perioada de concediu maternal ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RAG-WEB-SEARCH",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/rag/web-search/chat?message=What was the score between Spain and France at FIFA World Cup 2026 ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "rag",
+                "web-search",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What was the score between Spain and France at FIFA World Cup 2026 ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section06",
+      "item": [
+        {
+          "name": "LOCAL-TIME",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag20",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tools/local-time?message=What is the current time in Romania, Bucharest ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "tools",
+                "local-time"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is the current time in Romania, Bucharest ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HELP-DESK question",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag07",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tools/help-desk?message=What is the status of my ticket ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "tools",
+                "help-desk"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is the status of my ticket ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HELP-DESK answer1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag07",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tools/help-desk?message=Create a ticket because I forgot the  and I cannot login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "tools",
+                "help-desk"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Create a ticket because I forgot the  and I cannot login"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HELP-DESK answer2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag08",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/tools/help-desk?message=Create a ticket because I forgot the SSH key and I cannot login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "tools",
+                "help-desk"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Create a ticket because I forgot the SSH key and I cannot login"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section07",
+      "item": [
+        {
+          "name": "MCPCLIENT",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag05",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/chat?message=Who are you and how can you help me ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Who are you and how can you help me ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MCPCLIENT Github repos",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/chat?message=List down the GitHub repositories of arg-ant",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "List down the GitHub repositories of arg-ant"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MCPCLIENT Create file",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "username",
+                "value": "ag01",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/chat?message=Create a file name helloWorld.txt in D:/Repos/spring-ai/mcp",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Create a file name helloWorld.txt in D:/Repos/spring-ai/mcp"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section08",
+      "item": [
+        {
+          "name": "SelfEvalChat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/evaluate/chat?message=What is the capital of Romania?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "evaluate",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "What is the capital of Romania?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SelfEvalChat prompt-stuffing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/evaluate/prompt-stuffing?message=Given that I used 5 paid leaves, how many remained for current year?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "evaluate",
+                "prompt-stuffing"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Given that I used 5 paid leaves, how many remained for current year?"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section_10",
+      "item": [
+        {
+          "name": "TranscribeBasic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/transcribe",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "transcribe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TranscribeOptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/transcribe-options",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "transcribe-options"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SpeechBasic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/speech?message=Spring AI framework is cool ?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "speech"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Spring AI framework is cool ?"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SpeechOptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/speech-options?message=Spring AI is an exciting framework that simplifies building AI-powered applications. It integrates seamlessly with Spring Boot, enabling developers to leverage large language models and create intelligent, scalable solutions with ease",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "speech-options"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Spring AI is an exciting framework that simplifies building AI-powered applications. It integrates seamlessly with Spring Boot, enabling developers to leverage large language models and create intelligent, scalable solutions with ease"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ImageBasic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/image?message=Black-and-white close-up of a smiling woman with closed eyes, her hair framing her face naturally, exuding warmth and joy.",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "image"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Black-and-white close-up of a smiling woman with closed eyes, her hair framing her face naturally, exuding warmth and joy."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ImageOptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/image-options?message=Three people collaborate in a modern office, discussing a presentation projected on the wall. Minimalist design with warm lighting",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "image-options"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "Three people collaborate in a modern office, discussing a presentation projected on the wall. Minimalist design with warm lighting"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
