@@ -123,6 +123,18 @@ every 5 seconds.
 
 ## Architecture
 
+### Flow Diagrams
+
+Detailed Mermaid diagrams for the main request flows live in [`docs/flows`](docs/flows):
+
+| Flow | Doc |
+|---|---|
+| Overall architecture (controller → ChatClient → advisors → model → infra) | [`01-overall-architecture.md`](docs/flows/01-overall-architecture.md) |
+| RAG pipeline (query translation → vector search → PII masking → prompt injection) | [`02-rag-pipeline.md`](docs/flows/02-rag-pipeline.md) |
+| Chat memory (per-user history load/save via H2) | [`03-chat-memory.md`](docs/flows/03-chat-memory.md) |
+| Help-desk tool calling (model-invoked `@Tool` methods) | [`04-helpdesk-tool-calling.md`](docs/flows/04-helpdesk-tool-calling.md) |
+| Self-evaluation / fact-checking | [`05-self-evaluation.md`](docs/flows/05-self-evaluation.md) |
+
 ### ChatClientFactory
 
 Central factory that creates pre-configured `ChatClient.Builder` instances. Every client gets `SimpleLoggerAdvisor` and
